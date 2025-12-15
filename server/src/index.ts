@@ -12,21 +12,21 @@ if (!BOT_TOKEN) {
 // --- Telegram bot via grammy ---
 const bot = new Bot(BOT_TOKEN)
 bot.command('start', ctx => ctx.reply('Бот активен! Играйте на сайте.'))
-const WEBAPP_URL = process.env.VITE_WEBAPP_URL || '';
-bot.command('game', ctx =>
-  ctx.reply('Открыть игру:', {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: 'Играть в крестики-нолики',
-            web_app: { url: WEBAPP_URL }
-          }
-        ]
-      ]
-    }
-  })
-)
+// const WEBAPP_URL = process.env.VITE_WEBAPP_URL || '';
+// bot.command('game', ctx =>
+//   ctx.reply('Открыть игру:', {
+//     reply_markup: {
+//       inline_keyboard: [
+//         [
+//           {
+//             text: 'Играть в крестики-нолики',
+//             web_app: { url: WEBAPP_URL }
+//           }
+//         ]
+//       ]
+//     }
+//   })
+// )
 bot.start()
 
 // --- Express API ---

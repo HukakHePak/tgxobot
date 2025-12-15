@@ -87,7 +87,7 @@ export default function Game(){
       await fetch(`${base}/api/send-result`, {
         method: 'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ result: r, code, chat_id: chatId })
-      })
+      });
     }catch(err){
       // ignore network errors locally
       console.warn('notify error', err)
