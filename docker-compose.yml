@@ -4,15 +4,14 @@ services:
     build: ./server
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
-      - CHAT_ID=${CHAT_ID}
-      - PORT=3001
+      - PORT=${PORT}
     ports:
-      - "3001:3001"
+      - "${PORT}:${PORT}"
 
   client:
     build: ./client
     environment:
-      - VITE_API_BASE=http://server:3001
+      - VITE_API_BASE=http://server:${PORT}
     ports:
       - "5173:5173"
     depends_on:
