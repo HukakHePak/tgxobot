@@ -74,7 +74,16 @@ export default function Game(){
 
   async function notifyServer(r:'win'|'loss', code?:string){
     try{
-      const base = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:3001'
+      let base = '';
+      const webAppUrl = import.meta.env.VITE_WEBAPP_URL as string | undefined;
+
+      if (webAppUrl) {
+        try {
+          const url = new URL(webAppUrl);
+          base = url.origin;
+        } catch {}
+      }
+      if (!base) base = 'http://localhost:3001';
       await fetch(`${base}/api/send-result`, {
         method: 'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ result: r, code, chat_id: chatId })

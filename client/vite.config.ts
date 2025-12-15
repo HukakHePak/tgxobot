@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Получаем домен из переменной окружения WEBAPP_URL
-const webAppUrl = process.env.WEBAPP_URL || '';
-let allowedHosts = [];
+const webAppUrl = process.env.VITE_WEBAPP_URL || '';
+
+let allowedHosts = [] as string[];
 try {
   if (webAppUrl) {
     const { hostname } = new URL(webAppUrl);
@@ -17,6 +17,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    allowedHosts
+    allowedHosts,
+    watch: {
+      usePolling: true,
+      interval: 300
+    }
   }
 })

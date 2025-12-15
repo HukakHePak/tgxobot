@@ -12,7 +12,7 @@ if (!BOT_TOKEN) {
 // --- Telegram bot via grammy ---
 const bot = new Bot(BOT_TOKEN)
 bot.command('start', ctx => ctx.reply('Бот активен! Играйте на сайте.'))
-const WEBAPP_URL = process.env.WEBAPP_URL || '';
+const WEBAPP_URL = process.env.VITE_WEBAPP_URL || '';
 bot.command('game', ctx =>
   ctx.reply('Открыть игру:', {
     reply_markup: {
@@ -31,13 +31,24 @@ bot.start()
 
 // --- Express API ---
 const app = express()
-app.use(cors())
+const corsOrigin = process.env.VITE_WEBAPP_URL || undefined;
+app.use(cors({ origin: corsOrigin, credentials: true }))
 app.use(express.json())
 
-// POST /api/send-result { chat_id, result, code }
-app.post('/api/send-result', async (req, res) => {
+// Лог всех входящих запросов
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
+  next()
+})
+
+app.post('/send-result', async (req, res) => {
   const { chat_id, result, code } = req.body || {}
-  if (!chat_id) return res.status(400).json({ ok: false, error: 'chat_id is required' })
+  console.log('[send-result] body:', req.body)
+  if (!chat_id) {
+    console.warn('[send-result] Нет chat_id!')
+    
+    return res.status(400).json({ ok: false, error: 'chat_id is required' })
+  }
   let text = ''
   if (result === 'win') {
     text = `Победа! Промокод выдан: ${code || ''}`
@@ -46,11 +57,14 @@ app.post('/api/send-result', async (req, res) => {
   }
   try {
     const data = await bot.api.sendMessage(chat_id, text)
+    console.log('[send-result] Успешно отправлено:', { chat_id, text, data })
     return res.json({ ok: true, data })
   } catch (err) {
+    console.error('[send-result] Ошибка отправки:', err)
     return res.status(500).json({ ok: false, error: String(err) })
   }
 })
 
 const PORT = Number(process.env.PORT) || 3001
+console.log('Starting server...')
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`))
