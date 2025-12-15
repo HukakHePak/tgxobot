@@ -16,27 +16,42 @@ function checkWinner(squares: Player[]) {
   return null
 }
 
+
+// Получение chat_id из Telegram WebApp API
+function getTelegramChatId(): number | undefined {
+  // @ts-ignore
+  const tg = window.Telegram?.WebApp;
+  // @ts-ignore
+  const initData = tg?.initDataUnsafe;
+  return initData?.user?.id;
+}
+
 export default function Game(){
   const [squares, setSquares] = useState<Player[]>(Array(9).fill(null))
   const [isPlayerTurn, setPlayerTurn] = useState(true)
   const [result, setResult] = useState<'win'|'loss'|null>(null)
   const [promo, setPromo] = useState<string | null>(null)
+  const [chatId, setChatId] = useState<number | undefined>(undefined)
 
-  useEffect(()=>{
-    const winner = checkWinner(squares)
-    if (winner === 'X') {
-      setResult('win')
-      const code = String(Math.floor(10000 + Math.random()*90000))
-      setPromo(code)
-      notifyServer('win', code)
-    } else if (winner === 'O') {
-      setResult('loss')
-      notifyServer('loss')
-    } else if (squares.every(Boolean)) {
-      setResult('loss')
-      notifyServer('loss')
+  React.useEffect(() => {
+    setChatId(getTelegramChatId());
+  }, []);
+
+  useEffect(() => {
+    const winner = checkWinner(squares);
+    if (winner === 'X' && result !== 'win') {
+      const code = String(Math.floor(10000 + Math.random() * 90000));
+      setResult('win');
+      setPromo(code);
+      notifyServer('win', code);
+    } else if (winner === 'O' && result !== 'loss') {
+      setResult('loss');
+      notifyServer('loss');
+    } else if (squares.every(Boolean) && !winner && result !== 'loss') {
+      setResult('loss');
+      notifyServer('loss');
     }
-  },[squares])
+  }, [squares, result]);
 
   useEffect(()=>{
     if (!isPlayerTurn && !result) {
@@ -59,11 +74,20 @@ export default function Game(){
 
   async function notifyServer(r:'win'|'loss', code?:string){
     try{
-      const base = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:3001'
+      let base = '';
+      const webAppUrl = import.meta.env.VITE_WEBAPP_URL as string | undefined;
+
+      if (webAppUrl) {
+        try {
+          const url = new URL(webAppUrl);
+          base = url.origin;
+        } catch {}
+      }
+      if (!base) base = 'http://localhost:3001';
       await fetch(`${base}/api/send-result`, {
         method: 'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ result: r, code })
-      })
+        body: JSON.stringify({ result: r, code, chat_id: chatId })
+      });
     }catch(err){
       // ignore network errors locally
       console.warn('notify error', err)
