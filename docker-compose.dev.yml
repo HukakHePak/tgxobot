@@ -8,22 +8,22 @@ services:
       context: ./server
     volumes:
       - ./server:/app
-      - /app/node_modules
     env_file:
       - .env
     networks:
       - tgxonet
+    command: npm run dev
 
   client:
     build:
       context: ./client
     volumes:
       - ./client:/app
-      - /app/node_modules
     env_file:
       - .env
     networks:
       - tgxonet
+    command: npm run dev -- --host
 
   nginx:
     image: nginx:1.25-alpine

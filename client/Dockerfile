@@ -1,7 +1,8 @@
-# Dockerfile for client (Node 20, dev)
+# Dockerfile for client (Node 20, prod by default)
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["npm", "run", "dev", "--", "--host"]
+RUN npm run build
+CMD ["npm", "run", "preview", "--", "--host"]
