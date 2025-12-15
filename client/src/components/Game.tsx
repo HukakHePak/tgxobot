@@ -37,21 +37,21 @@ export default function Game(){
     setChatId(getTelegramChatId());
   }, []);
 
-  useEffect(()=>{
-    const winner = checkWinner(squares)
-    if (winner === 'X') {
-      setResult('win')
-      const code = String(Math.floor(10000 + Math.random()*90000))
-      setPromo(code)
-      notifyServer('win', code)
-    } else if (winner === 'O') {
-      setResult('loss')
-      notifyServer('loss')
-    } else if (squares.every(Boolean)) {
-      setResult('loss')
-      notifyServer('loss')
+  useEffect(() => {
+    const winner = checkWinner(squares);
+    if (winner === 'X' && result !== 'win') {
+      const code = String(Math.floor(10000 + Math.random() * 90000));
+      setResult('win');
+      setPromo(code);
+      notifyServer('win', code);
+    } else if (winner === 'O' && result !== 'loss') {
+      setResult('loss');
+      notifyServer('loss');
+    } else if (squares.every(Boolean) && !winner && result !== 'loss') {
+      setResult('loss');
+      notifyServer('loss');
     }
-  },[squares])
+  }, [squares, result]);
 
   useEffect(()=>{
     if (!isPlayerTurn && !result) {
