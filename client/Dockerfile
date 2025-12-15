@@ -1,5 +1,5 @@
-# Dockerfile for client (Node 22, dev)
-FROM node:22-alpine
+# Dockerfile for client (Node 20, dev)
+FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
