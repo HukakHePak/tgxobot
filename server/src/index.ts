@@ -1,37 +1,36 @@
+
+
 import express from 'express'
 import cors from 'cors'
+import { Bot } from 'grammy'
 
+const BOT_TOKEN = process.env.BOT_TOKEN
+if (!BOT_TOKEN) {
+  throw new Error('BOT_TOKEN not set in environment!')
+}
+
+// --- Telegram bot via grammy ---
+const bot = new Bot(BOT_TOKEN)
+bot.command('start', ctx => ctx.reply('Бот активен! Играйте на сайте.'))
+bot.start()
+
+// --- Express API ---
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-const BOT_TOKEN = process.env.BOT_TOKEN
-const CHAT_ID = process.env.CHAT_ID
-
-if (!BOT_TOKEN || !CHAT_ID) {
-  console.warn('Warning: BOT_TOKEN or CHAT_ID not set in environment. Telegram messages will fail.')
-}
-
+// POST /api/send-result { chat_id, result, code }
 app.post('/api/send-result', async (req, res) => {
-  const { result, code } = req.body || {}
-  if (!BOT_TOKEN || !CHAT_ID) return res.status(500).json({ ok: false, error: 'Bot token or chat id not configured' })
-
+  const { chat_id, result, code } = req.body || {}
+  if (!chat_id) return res.status(400).json({ ok: false, error: 'chat_id is required' })
   let text = ''
   if (result === 'win') {
     text = `Победа! Промокод выдан: ${code || ''}`
   } else {
     text = 'Проигрыш'
   }
-
   try {
-    const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`
-    const resp = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text })
-    })
-    const data = await resp.json()
-    if (!data.ok) return res.status(500).json({ ok: false, error: data })
+    const data = await bot.api.sendMessage(chat_id, text)
     return res.json({ ok: true, data })
   } catch (err) {
     return res.status(500).json({ ok: false, error: String(err) })
