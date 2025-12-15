@@ -16,11 +16,26 @@ function checkWinner(squares: Player[]) {
   return null
 }
 
+
+// Получение chat_id из Telegram WebApp API
+function getTelegramChatId(): number | undefined {
+  // @ts-ignore
+  const tg = window.Telegram?.WebApp;
+  // @ts-ignore
+  const initData = tg?.initDataUnsafe;
+  return initData?.user?.id;
+}
+
 export default function Game(){
   const [squares, setSquares] = useState<Player[]>(Array(9).fill(null))
   const [isPlayerTurn, setPlayerTurn] = useState(true)
   const [result, setResult] = useState<'win'|'loss'|null>(null)
   const [promo, setPromo] = useState<string | null>(null)
+  const [chatId, setChatId] = useState<number | undefined>(undefined)
+
+  React.useEffect(() => {
+    setChatId(getTelegramChatId());
+  }, []);
 
   useEffect(()=>{
     const winner = checkWinner(squares)
@@ -62,7 +77,7 @@ export default function Game(){
       const base = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:3001'
       await fetch(`${base}/api/send-result`, {
         method: 'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ result: r, code })
+        body: JSON.stringify({ result: r, code, chat_id: chatId })
       })
     }catch(err){
       // ignore network errors locally
