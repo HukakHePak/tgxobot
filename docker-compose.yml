@@ -20,7 +20,7 @@ services:
   nginx:
     image: nginx:stable
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
     depends_on:
       - server
       - client
@@ -30,31 +30,3 @@ services:
 networks:
   default:
     name: tgxobot_prod
-version: '3.8'
-env_file:
-  - ./.env
-services:
-  server:
-    build: ./server
-    environment:
-      - BOT_TOKEN=${BOT_TOKEN}
-      - PORT=${PORT}
-    # no host ports exposed for server; nginx will proxy requests
-
-  nginx:
-    image: nginx:stable
-    ports:
-      - "${NGINX_PORT}:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - server
-      - client
-
-  client:
-    build: ./client
-    environment:
-      - VITE_API_BASE=http://nginx:${PORT:-80}
-    # no host ports exposed for client; nginx will proxy requests
-    depends_on:
-      - server
