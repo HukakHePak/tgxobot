@@ -1,82 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { Box, Button, Grid, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material'
+import React, { useState, useEffect } from 'react';
+import { Box, Button } from '@mui/material';
+import { getTelegramChatId } from '../api/telegram';
+import { Board } from './Board';
+import { ResultDialog } from './ResultDialog';
+import { useTicTacToe } from '../hooks/useTicTacToe';
 
-type Player = 'X' | 'O' | null
+export default function Game() {
+  const [chatId, setChatId] = useState<number | undefined>(undefined);
 
-const WIN_LINES = [
-  [0,1,2],[3,4,5],[6,7,8],
-  [0,3,6],[1,4,7],[2,5,8],
-  [0,4,8],[2,4,6]
-]
-
-function checkWinner(squares: Player[]) {
-  for (const [a,b,c] of WIN_LINES) {
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) return squares[a]
-  }
-  return null
-}
-
-
-// Получение chat_id из Telegram WebApp API
-function getTelegramChatId(): number | undefined {
-  // @ts-ignore
-  const tg = window.Telegram?.WebApp;
-  // @ts-ignore
-  const initData = tg?.initDataUnsafe;
-  return initData?.user?.id;
-}
-
-export default function Game(){
-  const [squares, setSquares] = useState<Player[]>(Array(9).fill(null))
-  const [isPlayerTurn, setPlayerTurn] = useState(true)
-  const [result, setResult] = useState<'win'|'loss'|null>(null)
-  const [promo, setPromo] = useState<string | null>(null)
-  const [chatId, setChatId] = useState<number | undefined>(undefined)
-
-  React.useEffect(() => {
+  useEffect(() => {
     setChatId(getTelegramChatId());
   }, []);
 
-  useEffect(() => {
-    const winner = checkWinner(squares);
-    if (winner === 'X' && result !== 'win') {
-      const code = String(Math.floor(10000 + Math.random() * 90000));
-      setResult('win');
-      setPromo(code);
-      notifyServer('win', code);
-    } else if (winner === 'O' && result !== 'loss') {
-      setResult('loss');
-      notifyServer('loss');
-    } else if (squares.every(Boolean) && !winner && result !== 'loss') {
-      setResult('loss');
-      notifyServer('loss');
-    }
-  }, [squares, result]);
-
-  useEffect(()=>{
-    if (!isPlayerTurn && !result) {
-      const empty = squares.map((v,i)=>v?null:i).filter(Boolean) as number[]
-      const choice = empty[Math.floor(Math.random()*empty.length)]
-      if (choice !== undefined) {
-        const next = squares.slice(); next[choice]= 'O'; setSquares(next)
-      }
-      setPlayerTurn(true)
-    }
-  },[isPlayerTurn, squares, result])
-
-  function handleClick(i:number){
-    if (!isPlayerTurn) return
-    if (squares[i] || result) return
-    const next = squares.slice(); next[i] = 'X'; setSquares(next); setPlayerTurn(false)
-  }
-
-  function reset(){ setSquares(Array(9).fill(null)); setResult(null); setPromo(null); setPlayerTurn(true) }
-
-  async function notifyServer(r:'win'|'loss', code?:string){
-    try{
+  const notifyServer = async (r: 'win' | 'loss', code?: string) => {
+    try {
       let base = '';
       const webAppUrl = import.meta.env.VITE_WEBAPP_URL as string | undefined;
-
       if (webAppUrl) {
         try {
           const url = new URL(webAppUrl);
@@ -85,47 +24,27 @@ export default function Game(){
       }
       if (!base) base = 'http://localhost:3001';
       await fetch(`${base}/api/send-result`, {
-        method: 'POST', headers:{'Content-Type':'application/json'},
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ result: r, code, chat_id: chatId })
       });
-    }catch(err){
+    } catch (err) {
       // ignore network errors locally
-      console.warn('notify error', err)
+      console.warn('notify error', err);
     }
-  }
+  };
+
+  const { squares, isPlayerTurn, result, promo, handleClick, reset } = useTicTacToe(notifyServer);
 
   return (
-    <Box sx={{ mt:4 }}>
-      <Grid container spacing={1} sx={{ width: 300, margin: '0 auto' }}>
-        {squares.map((s,i)=> (
-          <Grid item xs={4} key={i}>
-            <Paper onClick={()=>handleClick(i)} elevation={3} sx={{ height:80, display:'flex', alignItems:'center', justifyContent:'center', cursor: result? 'default' : 'pointer', bgcolor: '#fff0f6' }}>
-              <Typography variant="h4">{s}</Typography>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Box sx={{ textAlign:'center', mt:3 }}>
-        <Button variant="contained" color="secondary" onClick={reset}>Сбросить</Button>
+    <Box sx={{ mt: 4 }}>
+      <Board squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
+      <Box sx={{ textAlign: 'center', mt: 3 }}>
+        <Button variant="contained" color="secondary" onClick={reset}>
+          Сбросить
+        </Button>
       </Box>
-
-      <Dialog open={!!result}>
-        <DialogTitle>{result === 'win' ? 'Вы победили!' : 'Вы проиграли'}</DialogTitle>
-        <DialogContent>
-          {result === 'win' ? (
-            <Box>
-              <Typography>Ваш промокод:</Typography>
-              <Typography variant="h5" sx={{ mt:1, color:'#b85b8a' }}>{promo}</Typography>
-            </Box>
-          ) : (
-            <Typography>Попробуйте ещё раз?</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={reset}>Играть ещё</Button>
-        </DialogActions>
-      </Dialog>
+      <ResultDialog open={!!result} result={result} promo={promo} onReset={reset} />
     </Box>
-  )
+  );
 }
