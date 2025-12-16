@@ -1,30 +1,19 @@
-import React, { Suspense, useEffect } from 'react'
-import { useGLTF } from '@react-three/drei'
+import React, { Suspense } from 'react'
+import GenericModel from './GenericModel'
 import { getRocketGltfSync } from './modelLoader'
 
-function BundledRocket({ url, scale, y }: { url: string; scale?: number; y?: number }) {
-  const { scene } = useGLTF(url) as any
-  useEffect(() => {
-    ;(useGLTF as any).preload?.(url)
-  }, [url])
-  const s = scale ?? 0.6
-  const yOff = y ?? 0.9
-  return (
-    <group position={[0, yOff, 0]}>
-      <primitive object={scene.clone()} scale={s} />
-    </group>
-  )
-}
-
 export default function RocketModel(props: { scale?: number; y?: number }) {
-  // Resolve URL synchronously to avoid changing hook order across renders
   const url = getRocketGltfSync()
-
   if (!url) return null
+
+  // Reduce rocket size further: use divisor 4 (smaller than previous 3)
+  const requested = props.scale ?? 0.6
+  const finalScale = requested / 4
+  const posY = props.y ?? 0.9
 
   return (
     <Suspense fallback={null}>
-      <BundledRocket url={url} scale={props.scale} y={props.y} />
+      <GenericModel url={url} scale={finalScale} position={[0, posY, 0]} />
     </Suspense>
   )
 }
