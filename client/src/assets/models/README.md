@@ -1,7 +1,7 @@
-Add your glTF or GLB models here to have them bundled by Vite.
+Add your glTF models here to have them bundled by Vite.
 
-- Place a file named `rocket.gltf` or `rocket.glb` (or any name) inside this folder.
-- This project will automatically detect the first `*.gltf`/`*.glb` file in this folder and use it as the rocket model.
+- Place a file named `rocket.gltf` (or any `.gltf` file) inside this folder.
+- This project will automatically detect the first `*.gltf` file in this folder and use it as the rocket model.
 - When you add a model, Vite will bundle it and the in-app loader will pick it up automatically.
 
 Notes:
