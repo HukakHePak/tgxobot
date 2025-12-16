@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react'
+import React, { Suspense, useRef, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
+import RocketModel from './models/RocketModel'
 
 type Square = 'X' | 'O' | null
 
@@ -13,48 +14,24 @@ interface ThreeBoardProps {
 
 const PLANET_COUNT = 4
 
-function Rocket() {
-  return (
-    <group rotation={[0, 0, 0]}>
-      <mesh position={[0, 1.0, 0]}>
-        <coneGeometry args={[0.45, 1.0, 16]} />
-        <meshStandardMaterial color="#fff" metalness={0.6} roughness={0.18} emissive="#111" />
-      </mesh>
-      <mesh position={[0, 0.4, 0]}> 
-        <cylinderGeometry args={[0.3, 0.3, 0.9, 16]} />
-        <meshStandardMaterial color="#d94f2b" metalness={0.5} roughness={0.22} />
-      </mesh>
-      <mesh position={[0.36, 0.06, 0]} rotation={[0, 0, 0.6]}> 
-        <boxGeometry args={[0.18, 0.02, 0.5]} />
-        <meshStandardMaterial color="#a02b1a" metalness={0.4} roughness={0.3} />
-      </mesh>
-      <mesh position={[-0.36, 0.06, 0]} rotation={[0, 0, -0.6]}> 
-        <boxGeometry args={[0.18, 0.02, 0.5]} />
-        <meshStandardMaterial color="#a02b1a" metalness={0.4} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, -0.08, 0]}> 
-        <cylinderGeometry args={[0.12, 0.12, 0.18, 12]} />
-        <meshStandardMaterial color="#222" metalness={1} roughness={0.08} />
-      </mesh>
-    </group>
-  )
-}
+// RocketModel from provided assets will be used
 
 function Planet({ variant }: { variant: number | null }) {
-  const colors = ['#6fb3ff', '#ffcc88', '#88ffb3', '#cfa0ff']
-  const accents = ['#335577', '#664422', '#2a6644', '#4a2a66']
+  // smaller planets, new color palette (no bright blue)
+  const colors = ['#d9a066', '#b0d6a5', '#cfa0ff', '#ffd27f']
+  const accents = ['#7a4d2a', '#4b7a52', '#4a2a66', '#7a552a']
   const color = colors[variant ?? 0]
   const accent = accents[variant ?? 0]
 
   return (
-    <group position={[0, 0.6, 0]}>
+    <group position={[0, 0.45, 0]}>
       <mesh>
-        <sphereGeometry args={[0.9, 32, 32]} />
-        <meshStandardMaterial color={color} metalness={0.25} roughness={0.4} emissive={accent} />
+        <sphereGeometry args={[0.45, 32, 32]} />
+        <meshStandardMaterial color={color} metalness={0.25} roughness={0.45} emissive={accent} />
       </mesh>
       {variant === 1 && (
         <mesh rotation={[Math.PI / 2, 0, 0]}> 
-          <torusGeometry args={[1.2, 0.08, 16, 60]} />
+          <torusGeometry args={[0.6, 0.05, 16, 60]} />
           <meshStandardMaterial color="#cfa87f" metalness={0.35} roughness={0.6} emissive="#442200" />
         </mesh>
       )}
@@ -143,7 +120,11 @@ function Cell({ idx, value, position, onClick, disabled, planetVariant }: any) {
         <meshStandardMaterial metalness={0.8} roughness={0.2} color={value ? '#111827' : '#0b1220'} emissive={value ? '#001f3f' : '#021428'} />
       </mesh>
 
-      {value === 'X' && <Rocket />}
+      {value === 'X' && (
+        <Suspense fallback={null}>
+          <RocketModel scale={0.9} />
+        </Suspense>
+      )}
       {value === 'O' && <Planet variant={planetVariant ?? 0} />}
     </group>
   )
@@ -162,18 +143,25 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
     [3.2, 0, 3.2]
   ]
 
-  // persistent random variant assignment for planets
+  // persistent random variant assignment for planets, assign only on transition to 'O'
   const planetVariantsRef = useRef<(number | null)[]>(Array(9).fill(null))
+  const prevSquaresRef = useRef<Square[] | null>(null)
 
   useEffect(() => {
-    squares.forEach((v, i) => {
-      if (v === 'O' && planetVariantsRef.current[i] == null) {
+    const prev = prevSquaresRef.current
+    for (let i = 0; i < squares.length; i++) {
+      const prevVal = prev ? prev[i] : null
+      const curVal = squares[i]
+      // assign variant only when it just became 'O'
+      if (prevVal !== 'O' && curVal === 'O' && planetVariantsRef.current[i] == null) {
         planetVariantsRef.current[i] = Math.floor(Math.random() * PLANET_COUNT)
       }
-      if (v !== 'O' && planetVariantsRef.current[i] != null) {
+      // clear variant when cell is cleared
+      if (curVal !== 'O' && planetVariantsRef.current[i] != null) {
         planetVariantsRef.current[i] = null
       }
-    })
+    }
+    prevSquaresRef.current = [...squares]
   }, [squares])
 
   return (
