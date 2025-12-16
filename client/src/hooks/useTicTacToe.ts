@@ -24,6 +24,10 @@ export function useTicTacToe(onResult: (result: 'win' | 'loss', code?: string) =
 
   useEffect(() => {
     if (!isPlayerTurn && !result) {
+      // If the board already has a winner or is full, don't let AI play.
+      const immediateWinner = checkWinner(squares);
+      if (immediateWinner || squares.every(Boolean)) return;
+
       const empty = squares.map((v, i) => v ? null : i).filter((v) => v !== null) as number[];
 
       const computeAIMove = (): number | undefined => {
