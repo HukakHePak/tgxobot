@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
+import { sendResult } from '../api/sendResult';
 import { Board } from './Board';
 import { ResultDialog } from './ResultDialog';
 import { useTicTacToe } from '../hooks/useTicTacToe';
@@ -13,25 +14,7 @@ export default function Game() {
   }, []);
 
   const notifyServer = async (r: 'win' | 'loss', code?: string) => {
-    try {
-      let base = '';
-      const webAppUrl = import.meta.env.VITE_WEBAPP_URL as string | undefined;
-      if (webAppUrl) {
-        try {
-          const url = new URL(webAppUrl);
-          base = url.origin;
-        } catch {}
-      }
-      if (!base) base = 'http://localhost:3001';
-      await fetch(`${base}/api/send-result`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ result: r, code, chat_id: chatId })
-      });
-    } catch (err) {
-      // ignore network errors locally
-      console.warn('notify error', err);
-    }
+    await sendResult(r, chatId, code);
   };
 
   const { squares, isPlayerTurn, result, promo, handleClick, reset } = useTicTacToe(notifyServer);
