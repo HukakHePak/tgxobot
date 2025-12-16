@@ -3,6 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import RocketModel from './models/RocketModel'
+import PlanetModel from './models/PlanetModel'
+import { useState } from 'react'
 
 type Square = 'X' | 'O' | null
 
@@ -16,8 +18,21 @@ const PLANET_COUNT = 4
 
 // RocketModel from provided assets will be used
 
-function Planet({ variant }: { variant: number | null }) {
-  // smaller planets, new color palette (no bright blue)
+function Planet({ variant, planetUrls }: { variant: number | null; planetUrls: string[] | null }) {
+  if (variant == null) return null
+
+  // if planet models are available, render corresponding model
+  if (planetUrls && planetUrls[variant]) {
+    return (
+      <group position={[0, 0.9, 0]}>
+        <Suspense fallback={null}>
+          <PlanetModel url={planetUrls[variant]} scale={0.6} />
+        </Suspense>
+      </group>
+    )
+  }
+
+  // fallback procedural planet (keeps previous look)
   const colors = ['#d9a066', '#b0d6a5', '#cfa0ff', '#ffd27f']
   const accents = ['#7a4d2a', '#4b7a52', '#4a2a66', '#7a552a']
   const color = colors[variant ?? 0]
@@ -131,6 +146,21 @@ function Cell({ idx, value, position, onClick, disabled, planetVariant }: any) {
 }
 
 export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabled }) => {
+  const [planetUrls, setPlanetUrls] = useState<string[] | null>(null)
+
+  useEffect(() => {
+    // load all planet models under src/assets/models/planets/**
+    const modules = import.meta.glob('../../assets/models/planets/**/*.{gltf,glb}', { as: 'url' }) as Record<string, () => Promise<string>>
+    const keys = Object.keys(modules).sort()
+    if (keys.length === 0) {
+      setPlanetUrls(null)
+      return
+    }
+    Promise.all(keys.map((k) => modules[k]())).then((urls) => {
+      // ensure deterministic order and take up to PLANET_COUNT
+      setPlanetUrls(urls.slice(0, PLANET_COUNT))
+    }).catch(() => setPlanetUrls(null))
+  }, [])
   const positions = [
     [-3.2, 0, -3.2],
     [0, 0, -3.2],

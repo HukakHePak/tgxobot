@@ -1,34 +1,44 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 
-function BundledRocket({ url, scale }: { url: string; scale?: number }) {
+function BundledRocket({ url, scale, y }: { url: string; scale?: number; y?: number }) {
   const { scene } = useGLTF(url) as any
   useEffect(() => {
     ;(useGLTF as any).preload?.(url)
   }, [url])
-  return <primitive object={scene.clone()} scale={scale ?? 1} />
-}
-
-function ProceduralRocket({ scale }: { scale?: number }) {
+  const s = (scale ?? 1) * 0.5
+  const yOff = y ?? 0.9
   return (
-    <group scale={scale ?? 1} position={[0, 0.6, 0]}>
-      <mesh>
-        <cylinderGeometry args={[0.25, 0.25, 1.2, 16]} />
-        <meshStandardMaterial color="#d8d8d8" metalness={0.6} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, 0.7, 0]}>
-        <coneGeometry args={[0.28, 0.5, 16]} />
-        <meshStandardMaterial color="#ff6b6b" metalness={0.3} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, -0.65, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.1, 0.6]} />
-        <meshStandardMaterial color="#ff9f43" emissive="#ff6b00" />
-      </mesh>
+    <group position={[0, yOff, 0]}>
+      <primitive object={scene.clone()} scale={s} />
     </group>
   )
 }
 
-export default function RocketModel(props: { scale?: number }) {
+function ProceduralRocket({ scale, y }: { scale?: number; y?: number }) {
+  const s = (scale ?? 1) * 0.5
+  const yOff = y ?? 0.9
+  return (
+    <group position={[0, yOff, 0]}>
+      <group scale={s}>
+        <mesh>
+          <cylinderGeometry args={[0.25, 0.25, 1.2, 16]} />
+          <meshStandardMaterial color="#d8d8d8" metalness={0.6} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.7, 0]}>
+          <coneGeometry args={[0.28, 0.5, 16]} />
+          <meshStandardMaterial color="#ff6b6b" metalness={0.3} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.65, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.1, 0.6]} />
+          <meshStandardMaterial color="#ff9f43" emissive="#ff6b00" />
+        </mesh>
+      </group>
+    </group>
+  )
+}
+
+export default function RocketModel(props: { scale?: number; y?: number }) {
   const [url, setUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -61,10 +71,10 @@ export default function RocketModel(props: { scale?: number }) {
   if (url) {
     return (
       <Suspense fallback={null}>
-        <BundledRocket url={url} scale={props.scale} />
+        <BundledRocket url={url} scale={props.scale} y={props.y} />
       </Suspense>
     )
   }
 
-  return <ProceduralRocket scale={props.scale} />
+  return <ProceduralRocket scale={props.scale} y={props.y} />
 }
