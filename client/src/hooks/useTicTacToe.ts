@@ -25,13 +25,43 @@ export function useTicTacToe(onResult: (result: 'win' | 'loss', code?: string) =
   useEffect(() => {
     if (!isPlayerTurn && !result) {
       const empty = squares.map((v, i) => v ? null : i).filter((v) => v !== null) as number[];
-      const choice = empty[Math.floor(Math.random() * empty.length)];
+
+      const computeAIMove = (): number | undefined => {
+        // 1) Win if possible
+        for (const idx of empty) {
+          const test = squares.slice();
+          test[idx] = 'O';
+          if (checkWinner(test) === 'O') return idx;
+        }
+        // 2) Block opponent win
+        for (const idx of empty) {
+          const test = squares.slice();
+          test[idx] = 'X';
+          if (checkWinner(test) === 'X') return idx;
+        }
+        // 3) Take center
+        if (empty.includes(4)) return 4;
+        // 4) Take any corner
+        const corners = [0, 2, 6, 8];
+        for (const c of corners) if (empty.includes(c)) return c;
+        // 5) Take any side
+        const sides = [1, 3, 5, 7];
+        for (const s of sides) if (empty.includes(s)) return s;
+        return undefined;
+      };
+
+      const choice = computeAIMove();
       if (choice !== undefined) {
-        const next = squares.slice();
-        next[choice] = 'O';
-        setSquares(next);
+        // small delay to feel natural
+        setTimeout(() => {
+          const next = squares.slice();
+          next[choice] = 'O';
+          setSquares(next);
+          setPlayerTurn(true);
+        }, 300 + Math.floor(Math.random() * 300));
+      } else {
+        setPlayerTurn(true);
       }
-      setPlayerTurn(true);
     }
   }, [isPlayerTurn, squares, result]);
 
