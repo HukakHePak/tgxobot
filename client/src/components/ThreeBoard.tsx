@@ -131,11 +131,13 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
   ];
 
   return (
-    <div style={{ width: '100%', height: '100%', paddingTop: 48, boxSizing: 'border-box' }}>
-      <Canvas camera={{ position: [0, 8, 12], fov: 50 }}>
+    <div style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
+      <Canvas camera={{ position: [0, 8, 24], fov: 50 }}>
         <ambientLight intensity={0.6} />
-        <pointLight position={[10, 20, 10]} intensity={1.2} />
-        <pointLight position={[-10, 10, -10]} intensity={0.6} />
+        {/* main light moved to center-left */}
+        <pointLight position={[-4, 12, 0]} intensity={1.4} />
+        {/* fill/back light on the right */}
+        <pointLight position={[6, 10, -6]} intensity={0.6} />
 
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
 
@@ -146,7 +148,7 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
           <Cell key={i} idx={i} value={squares[i]} position={pos} onClick={onClick} disabled={disabled} />
         ))}
 
-        <OrbitControls enablePan={false} maxDistance={24} minDistance={8} />
+        <OrbitControls enablePan={false} maxDistance={48} minDistance={12} />
       </Canvas>
     </div>
   );
