@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="OXO splash">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Transparent background -->
+
+  <!-- Centered logo mark (ring + inner hole + accent rectangle) -->
+  <g>
+
+    <!-- Scale and translate the original logo mark (from client/public/logo.svg) -->
+    <!-- Original mark centers roughly at (28,28) inside a 56x56 area. We'll scale it to fit 512x512. -->
+    <g transform="translate(0,0)">
+      <!-- center group: place original mark at the center of 512x512 -->
+      <g transform="translate(256,256) scale(2.6666667) translate(-28,-28)">
+        <circle cx="28" cy="28" r="24" fill="url(#g)" opacity="0.95" />
+        <circle cx="28" cy="28" r="16" fill="#071025" />
+        <rect x="28" y="4" width="12" height="36" rx="3" fill="#ffd166" transform="rotate(45 28 28)" />
+      </g>
+    </g>
+  </g>
+</svg>
