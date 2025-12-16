@@ -1,0 +1,8 @@
+Model Information:
+* title:	Pixel Planet Kepler-36 b
+* source:	https://sketchfab.com/3d-models/pixel-planet-kepler-36-b-05a97414e94b4e3abc613af1cb9b9731
+* author:	AstroJar (https://sketchfab.com/AstroJar)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

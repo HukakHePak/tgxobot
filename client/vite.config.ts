@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 const webAppUrl = process.env.VITE_WEBAPP_URL || '';
 
 let allowedHosts = [] as string[];
+
 try {
   if (webAppUrl) {
     const { hostname } = new URL(webAppUrl);
@@ -15,6 +16,9 @@ try {
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    include: ['@react-three/fiber', '@react-three/drei', 'three']
+  },
   server: {
     host: true,
     allowedHosts,

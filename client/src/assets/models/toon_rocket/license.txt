@@ -1,0 +1,8 @@
+Model Information:
+* title:	3D Toon Shaded Rocket
+* source:	https://sketchfab.com/3d-models/3d-toon-shaded-rocket-8128f01723444678a6a537b9fb55e1eb
+* author:	musthe_1 (https://sketchfab.com/gbashir2007)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

@@ -1,0 +1,8 @@
+Model Information:
+* title:	Pixel Planet Kepler-452 b
+* source:	https://sketchfab.com/3d-models/pixel-planet-kepler-452-b-8265e720286d4048af6f266272254730
+* author:	AstroJar (https://sketchfab.com/AstroJar)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
