@@ -158,7 +158,18 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
 
   return (
     <div style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
-      <Canvas camera={{ position: [0, 8, 24], fov: 50 }}>
+      <Canvas
+        camera={{ position: [0, 24, 0], fov: 50 }}
+        onCreated={({ camera }) => {
+          // Place camera on a sphere so it's tilted 30deg from vertical (phi = 30°)
+          const phi = (30 * Math.PI) / 180 // 30 degrees in radians
+          const r = 30 // radius (distance from origin)
+          const y = r * Math.cos(phi)
+          const z = r * Math.sin(phi)
+          camera.position.set(0, y, z)
+          camera.lookAt(0, 0, 0)
+        }}
+      >
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 20, 10]} intensity={1.2} />
         <pointLight position={[-10, 10, -10]} intensity={0.6} />

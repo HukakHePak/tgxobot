@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react'
 import GenericModel from './GenericModel'
-import { getPlanetGltfSync } from './modelLoader'
+import { resolveAssetUrl } from './assetResolver'
 
 export default function PlanetModel({ url: propUrl, scale = 0.35 }: { url?: string; scale?: number }) {
-  const url = propUrl ?? getPlanetGltfSync()
+  const url = propUrl ?? resolveAssetUrl('../../assets/models/planets/planet_blue/scene.gltf')
   if (!url) return null
 
   return (

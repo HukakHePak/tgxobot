@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react'
 import GenericModel from './GenericModel'
-import { getRocketGltfSync } from './modelLoader'
+import { resolveAssetUrl } from './assetResolver'
 
 export default function RocketModel(props: { scale?: number; y?: number }) {
-  const url = getRocketGltfSync()
+  const url = resolveAssetUrl('../../assets/models/toon_rocket/scene.gltf')
   if (!url) return null
 
   // Reduce rocket size further: use divisor 4 (smaller than previous 3)
