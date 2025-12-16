@@ -7,7 +7,7 @@ function BundledRocket({ url, scale, y }: { url: string; scale?: number; y?: num
   useEffect(() => {
     ;(useGLTF as any).preload?.(url)
   }, [url])
-  const s = scale ?? 1
+  const s = scale ?? 0.6
   const yOff = y ?? 0.9
   return (
     <group position={[0, yOff, 0]}>

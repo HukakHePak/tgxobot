@@ -23,9 +23,9 @@ function Planet({ variant }: { variant: number | null }) {
 
   // Render a single bundled planet model (PlanetModel will resolve the asset itself)
   return (
-    <group position={[0, 0.9, 0]}>
+    <group position={[0, 1.05, 0]}>
       <Suspense fallback={null}>
-        <PlanetModel scale={0.6} />
+        <PlanetModel scale={0.4} />
       </Suspense>
     </group>
   )
@@ -114,7 +114,7 @@ function Cell({ idx, value, position, onClick, disabled, planetVariant }: any) {
 
       {value === 'X' && (
         <Suspense fallback={null}>
-          <RocketModel scale={0.9} />
+          <RocketModel scale={0.4} />
         </Suspense>
       )}
       {value === 'O' && <Planet variant={planetVariant ?? 0} />}
