@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Player } from '../types/game';
 import { checkWinner } from '../utils/checkWinner';
 
@@ -7,17 +7,22 @@ export function useTicTacToe(onResult: (result: 'win' | 'loss', code?: string) =
   const [isPlayerTurn, setPlayerTurn] = useState(true);
   const [result, setResult] = useState<'win' | 'loss' | null>(null);
   const [promo, setPromo] = useState<string | null>(null);
+  const aiTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const winner = checkWinner(squares);
-    if (winner === 'X' && result !== 'win') {
-      const code = String(Math.floor(10000 + Math.random() * 90000));
-      setResult('win');
-      setPromo(code);
-      onResult('win', code);
-    } else if ((winner === 'O' || (squares.every(Boolean) && !winner)) && result !== 'loss') {
-      setResult('loss');
-      onResult('loss');
+    // Only set result if it's not already set. Prevents race where both
+    // win/loss could be triggered sequentially and flip the dialog.
+    if (result == null) {
+      if (winner === 'X') {
+        const code = String(Math.floor(10000 + Math.random() * 90000));
+        setResult('win');
+        setPromo(code);
+        onResult('win', code);
+      } else if (winner === 'O' || (squares.every(Boolean) && !winner)) {
+        setResult('loss');
+        onResult('loss');
+      }
     }
     // eslint-disable-next-line
   }, [squares, result]);
@@ -56,18 +61,38 @@ export function useTicTacToe(onResult: (result: 'win' | 'loss', code?: string) =
 
       const choice = computeAIMove();
       if (choice !== undefined) {
-        // small delay to feel natural
-        setTimeout(() => {
-          const next = squares.slice();
-          next[choice] = 'O';
-          setSquares(next);
-          setPlayerTurn(true);
-        }, 300 + Math.floor(Math.random() * 300));
+        // schedule AI move with small delay; use functional setState to avoid
+        // stale closures and check current board before applying move
+        const delay = 300 + Math.floor(Math.random() * 300);
+        // clear any previous scheduled move
+        if (aiTimeoutRef.current) {
+          clearTimeout(aiTimeoutRef.current);
+        }
+        aiTimeoutRef.current = window.setTimeout(() => {
+          let applied = false;
+          setSquares((prev) => {
+            // if game already decided or cell occupied, don't apply
+            if (checkWinner(prev) || prev.every(Boolean) || prev[choice] != null) return prev;
+            const next = prev.slice();
+            next[choice] = 'O';
+            applied = true;
+            return next;
+          });
+          if (applied) setPlayerTurn(true);
+          aiTimeoutRef.current = null;
+        }, delay);
       } else {
         setPlayerTurn(true);
       }
     }
   }, [isPlayerTurn, squares, result]);
+
+  // cleanup on unmount: clear any pending AI timeout
+  useEffect(() => {
+    return () => {
+      if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
+    };
+  }, []);
 
   const handleClick = useCallback((i: number) => {
     if (!isPlayerTurn) return;
@@ -79,6 +104,11 @@ export function useTicTacToe(onResult: (result: 'win' | 'loss', code?: string) =
   }, [isPlayerTurn, squares, result]);
 
   const reset = useCallback(() => {
+    // clear any scheduled AI move
+    if (aiTimeoutRef.current) {
+      clearTimeout(aiTimeoutRef.current);
+      aiTimeoutRef.current = null;
+    }
     setSquares(Array(9).fill(null));
     setResult(null);
     setPromo(null);
