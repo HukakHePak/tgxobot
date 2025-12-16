@@ -1,6 +1,6 @@
 html, body, #root { height: 100%; }
 body { font-family: Inter, Roboto, sans-serif; background: radial-gradient(circle at 10% 10%, #071025 0%, #03050a 60%), linear-gradient(180deg, #061426 0%, #02040a 100%); color: #e6eef9; margin: 0; }
 #root { height: 100%; }
-.app-shell { display: flex; flex-direction: column; height: 100%; }
+.app-shell { display: flex; flex-direction: column; height: 100%; position: relative; }
 .app-content { flex: 1 1 auto; display: flex; align-items: stretch; justify-content: stretch; padding: 0; }
-.full-canvas { width: 100%; height: calc(100vh - 96px); }
+.full-canvas { width: 100%; height: 100vh; }
