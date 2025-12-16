@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
-import { Board } from './Board';
+import ThreeBoard from './ThreeBoard';
 import { ResultDialog } from './ResultDialog';
 import { useTicTacToe } from '../hooks/useTicTacToe';
 
@@ -21,7 +21,7 @@ export default function Game() {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Board squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
+      <ThreeBoard squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
       <Box sx={{ textAlign: 'center', mt: 3 }}>
         <Button variant="contained" color="secondary" onClick={reset}>
           Сбросить
