@@ -76,7 +76,7 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
   ];
 
   return (
-    <div style={{ width: '100%', height: 420 }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <Canvas camera={{ position: [0, 8, 12], fov: 50 }}>
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 20, 10]} intensity={1.2} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
 import ThreeBoard from './ThreeBoard';
@@ -20,14 +20,11 @@ export default function Game() {
   const { squares, isPlayerTurn, result, promo, handleClick, reset } = useTicTacToe(notifyServer);
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <ThreeBoard squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
-      <Box sx={{ textAlign: 'center', mt: 3 }}>
-        <Button variant="contained" color="secondary" onClick={reset}>
-          Сбросить
-        </Button>
-      </Box>
+    <Box sx={{ width: '100%' }}>
+      <div className="full-canvas">
+        <ThreeBoard squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
+      </div>
       <ResultDialog open={!!result} result={result} promo={promo} onReset={reset} />
     </Box>
-  );
+  )
 }

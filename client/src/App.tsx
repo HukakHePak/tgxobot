@@ -1,24 +1,24 @@
 import React from 'react'
-import { ThemeProvider, createTheme, Container, Typography, Box } from '@mui/material'
+import { ThemeProvider, createTheme, Box } from '@mui/material'
 import Game from './components/Game'
+import Header, { HEADER_HEIGHT } from './components/Header'
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#d291bc' },
-    secondary: { main: '#f7c6d7' }
+    primary: { main: '#3b82f6' },
+    secondary: { main: '#7c3aed' }
   }
 })
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="sm">
-        <Box sx={{ textAlign: 'center', mt: 6 }}>
-          <Typography variant="h4" gutterBottom>Крестики‑нолики</Typography>
-          <Typography variant="subtitle1" gutterBottom>Игра против компьютера — удачи!</Typography>
+      <div className="app-shell">
+        <Header />
+        <Box className="app-content">
           <Game />
         </Box>
-      </Container>
+      </div>
     </ThemeProvider>
   )
 }
