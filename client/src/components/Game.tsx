@@ -4,7 +4,7 @@ import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
 import ThreeBoard from './ThreeBoard';
 import { ResultDialog } from './ResultDialog';
-import { useTicTacToe } from '../hooks/useTicTacToe';
+import { useTicTacToe } from '../hooks/useTicTacToeReducer';
 
 export default function Game() {
   const [chatId, setChatId] = useState<number | undefined>(undefined);
