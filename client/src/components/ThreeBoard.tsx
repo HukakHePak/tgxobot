@@ -1,8 +1,10 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import Cell from './three/Cell'
 import BoardField from './three/BoardField'
+import RocketModel from './models/RocketModel'
+import PlanetModel, { PLANET_COLORS } from './models/PlanetModel'
 
 type Square = 'X' | 'O' | null
 
@@ -27,21 +29,22 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
     [3.2, 0, 3.2]
   ]
 
-  // persistent random variant assignment for planets, assign only on transition to 'O'
-  const planetVariantsRef = useRef<(number | null)[]>(Array(9).fill(null))
+  // Choose a planet color for the whole game; PlanetModel maps color -> model URL.
+  const [planetColor, setPlanetColor] = useState<string>(() => {
+    return PLANET_COLORS[Math.floor(Math.random() * PLANET_COLORS.length)] ?? 'blue'
+  })
+
   const prevSquaresRef = useRef<Square[] | null>(null)
 
   useEffect(() => {
     const prev = prevSquaresRef.current
-    for (let i = 0; i < squares.length; i++) {
-      const prevVal = prev ? prev[i] : null
-      const curVal = squares[i]
-      if (prevVal !== 'O' && curVal === 'O' && planetVariantsRef.current[i] == null) {
-        planetVariantsRef.current[i] = Math.floor(Math.random() * PLANET_COUNT)
-      }
-      if (curVal !== 'O' && planetVariantsRef.current[i] != null) {
-        planetVariantsRef.current[i] = null
-      }
+    // detect reset: previous had marks and now all cleared
+    const prevHadAny = prev ? prev.some((v) => v !== null) : false
+    const nowAllNull = squares.every((v) => v === null)
+    if (prevHadAny && nowAllNull) {
+      // pick a new planet color for the new game
+      const pick = PLANET_COLORS[Math.floor(Math.random() * PLANET_COLORS.length)]
+      setPlanetColor(pick)
     }
     prevSquaresRef.current = [...squares]
   }, [squares])
@@ -68,7 +71,23 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
         <BoardField />
 
         {positions.map((pos, i) => (
-          <Cell key={i} idx={i} value={squares[i]} position={pos} onClick={onClick} disabled={disabled} planetVariant={planetVariantsRef.current[i]} />
+          <group key={i}>
+            <Cell idx={i} value={squares[i]} position={pos} onClick={onClick} disabled={disabled} />
+
+            {squares[i] === 'X' && (
+              <group position={pos}>
+                <RocketModel scale={0.4} y={0.9} />
+              </group>
+            )}
+
+            {squares[i] === 'O' && (
+              <group position={pos}>
+                <group position={[0, 1.05, 0]}>
+                  <PlanetModel color={planetColor} scale={0.4} />
+                </group>
+              </group>
+            )}
+          </group>
         ))}
 
         <OrbitControls enablePan={false} maxDistance={48} minDistance={12} />

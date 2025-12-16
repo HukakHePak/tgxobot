@@ -1,8 +1,6 @@
-import React, { Suspense, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import RocketModel from '../models/RocketModel'
-import PlanetModel from '../models/PlanetModel'
 
 type CellProps = {
   idx: number
@@ -10,10 +8,9 @@ type CellProps = {
   position: [number, number, number]
   onClick: (i: number) => void
   disabled?: boolean
-  planetVariant?: number | null
 }
 
-export default function Cell({ idx, value, position, onClick, disabled, planetVariant }: CellProps) {
+export default function Cell({ idx, value, position, onClick, disabled }: CellProps) {
   const mesh = useRef<THREE.Mesh>(null!)
   const hover = useRef(false)
 
@@ -40,20 +37,6 @@ export default function Cell({ idx, value, position, onClick, disabled, planetVa
         <boxGeometry args={[2.8, 0.4, 2.8]} />
         <meshStandardMaterial metalness={0.8} roughness={0.2} color={value ? '#111827' : '#0b1220'} emissive={value ? '#001f3f' : '#021428'} />
       </mesh>
-
-      {value === 'X' && (
-        <Suspense fallback={null}>
-          <RocketModel scale={0.4} />
-        </Suspense>
-      )}
-
-      {value === 'O' && (
-        <group position={[0, 1.05, 0]}>
-          <Suspense fallback={null}>
-            <PlanetModel scale={0.4} />
-          </Suspense>
-        </group>
-      )}
     </group>
   )
 }
