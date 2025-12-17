@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
-import ThreeBoard from './ThreeBoard';
-import { ResultDialog } from './ResultDialog';
+import ThreeBoard from './three/Board';
+import { ResultDialog } from './dialogs/ResultDialog';
 import { useTicTacToe } from '../hooks/useTicTacToeReducer';
 
 export default function Game() {

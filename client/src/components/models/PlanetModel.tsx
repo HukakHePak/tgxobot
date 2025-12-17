@@ -1,6 +1,6 @@
 import React, { Suspense, useMemo } from 'react'
 import GenericModel from './GenericModel'
-import { resolveAssetUrl } from './assetResolver'
+import { resolveAssetUrl } from '../../utils/assetResolver'
 import AnimatedModel from './AnimatedModel'
 
 export const PLANET_COLORS = ['blue', 'green', 'purple', 'red'] as const

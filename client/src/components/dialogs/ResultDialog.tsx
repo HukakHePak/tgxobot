@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import ThreeModalCanvas from './ThreeModal'
+import Modal from '../three/Modal'
+import { COLORS, SIZES } from '../../constants/ui'
 
 interface ResultDialogProps {
   open: boolean
@@ -24,18 +25,15 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', inset: 0 }}>
-        <ThreeModalCanvas value={result === 'win' ? 'X' : result === 'loss' ? 'O' : null} result={result} promo={promo} onReset={onReset} />
-      </div>
-
-      <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
-        <div style={{ width: 360, padding: '16px 20px', borderRadius: 8, background: 'transparent', boxShadow: 'none', border: 'none', color: '#e6eef8', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <Modal open={open} title={result === 'win' ? 'You won!' : 'You lost'} message={result === 'win' ? (promo ?? '') : 'Better luck — try again'} onClose={onReset}>
+      {/* content rendered as children so Modal is purely presentational */}
+      <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ width: SIZES.modalWidth, padding: '16px 20px', borderRadius: 8, background: 'transparent', boxShadow: 'none', border: 'none', color: COLORS.text, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h2 style={{ margin: 0, marginBottom: 8, textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'You won!' : 'You lost'}</h2>
 
           {result === 'win' ? (
             <div style={{ marginTop: 8 }}>
-              <div style={{ color: '#9ad7ff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Your promo code</div>
+              <div style={{ color: COLORS.accent, textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Your promo code</div>
               <div
                 onClick={handleCopy}
                 role="button"
@@ -44,7 +42,7 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
                   marginTop: 8,
                   fontSize: 22,
                   fontWeight: 700,
-                  color: '#ffd166',
+                  color: COLORS.promo,
                   textShadow: '0 6px 18px rgba(0,0,0,0.6)',
                   border: '1px solid #ffd166',
                   padding: '6px 12px',
@@ -56,10 +54,10 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
               >
                 {promo}
               </div>
-              {copied && <div style={{ color: '#a7f3d0', marginTop: 8 }}>Copied!</div>}
+              {copied && <div style={{ color: COLORS.success, marginTop: 8 }}>Copied!</div>}
             </div>
           ) : (
-            <div style={{ marginTop: 12, color: '#9fb3c8', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Better luck — try again</div>
+            <div style={{ marginTop: 12, color: COLORS.muted, textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Better luck — try again</div>
           )}
 
           <div style={{ marginTop: 20, display: 'flex', gap: 12, justifyContent: 'center' }}>
@@ -80,7 +78,8 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
           </div>
         </div>
       </div>
-    </div>
+      {/* decorative 3D content is handled by Modal's Canvas */}
+    </Modal>
   )
 }
 

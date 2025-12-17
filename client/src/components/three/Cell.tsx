@@ -1,6 +1,7 @@
 import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { COLORS, SIZES } from '../../constants/ui'
 
 type CellProps = {
   idx: number
@@ -15,9 +16,10 @@ type CellProps = {
   showFill?: boolean
   edgeBaseOpacity?: number
   fillOpacity?: number
+  disableHover?: boolean
 }
 
-export default function Cell({ idx, value, position, onClick, disabled, showEdges = true, edgeColor, cellColor, cellEmissive, showFill = false, edgeBaseOpacity, fillOpacity }: CellProps) {
+export default function Cell({ idx, value, position, onClick, disabled, showEdges = true, edgeColor, cellColor, cellEmissive, showFill = false, edgeBaseOpacity, fillOpacity, disableHover = false }: CellProps) {
   const mesh = useRef<THREE.Mesh>(null!)
   const hover = useRef(false)
   const edgeRef = useRef<THREE.LineSegments>(null!)
@@ -25,7 +27,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
   const transform = useRef<THREE.Group>(null!)
 
   const edgesGeom = useMemo(() => {
-    const geo = new THREE.BoxGeometry(2.8, 2.8, 2.8)
+    const geo = new THREE.BoxGeometry(SIZES.cellSize, SIZES.cellSize, SIZES.cellSize)
     const edges = new THREE.EdgesGeometry(geo)
     // add per-vertex colors to create a pearlescent, non-uniform gradient
     const pos = edges.attributes.position
@@ -69,14 +71,15 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
   useFrame((state) => {
     if (!transform.current) return
     const t = state.clock.getElapsedTime()
-    const target = hover.current ? 1.08 : 1.0
+    // when hover is disabled (e.g., modal), keep target scale at 1.0
+    const target = (disableHover ? 1.0 : (hover.current ? 1.08 : 1.0))
     const cur = transform.current.scale.x
     const next = cur + (target - cur) * 0.12
     transform.current.scale.set(next, next, next)
 
     // animate edge glow opacity (simple pulsing shimmer)
     if (edgeMatRef.current) {
-      const base = hover.current ? 0.6 : (typeof (edgeBaseOpacity) === 'number' ? edgeBaseOpacity : 0.18)
+      const base = (!disableHover && hover.current) ? 0.6 : (typeof (edgeBaseOpacity) === 'number' ? edgeBaseOpacity : 0.18)
       const pulse = 0.5 + 0.5 * Math.sin(t * 3.0 + idx * 0.7)
       edgeMatRef.current.opacity = Math.min(1, base + pulse * 0.6)
     }
@@ -86,12 +89,16 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
     <group position={position}>
       <group
         ref={transform}
-        onPointerOver={() => (hover.current = true)}
-        onPointerOut={() => (hover.current = false)}
-        onPointerDown={(e) => {
-          e.stopPropagation()
-          if (!disabled) onClick(idx)
-        }}
+        {...(!disableHover
+          ? {
+              onPointerOver: () => (hover.current = true),
+              onPointerOut: () => (hover.current = false),
+              onPointerDown: (e: any) => {
+                e.stopPropagation()
+                if (!disabled) onClick(idx)
+              },
+            }
+          : {})}
       >
         <mesh ref={mesh}>
           <boxGeometry args={[2.8, 2.8, 2.8]} />
@@ -99,7 +106,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
             // when showing fill (modal) use less metallic/more rough so color reads better
             metalness={showFill ? 0.2 : 0.8}
             roughness={showFill ? 0.6 : 0.2}
-            color={cellColor ?? '#0b1220'}
+            color={cellColor ?? COLORS.modalBg}
             // give a small emissive tint when filled so dark-blue is visible under lighting
             emissive={cellEmissive ?? (showFill ? (cellColor ?? '#0b1220') : '#000000')}
             emissiveIntensity={showFill ? 0.08 : 0}

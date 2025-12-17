@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import GenericModel from './GenericModel'
-import { resolveAssetUrl } from './assetResolver'
+import { resolveAssetUrl } from '../../utils/assetResolver'
 import AnimatedModel from './AnimatedModel'
 
 export default function RocketModel(props: { scale?: number; y?: number }) {
