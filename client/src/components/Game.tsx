@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
 import ThreeBoard from './three/Board';
-import { ResultDialog } from './ResultDialog';
+import { ResultDialog } from './dialogs/ResultDialog';
 import { useTicTacToe } from '../hooks/useTicTacToeReducer';
 
 export default function Game() {

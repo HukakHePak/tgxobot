@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Modal from './three/Modal'
-import { COLORS, SIZES } from '../constants/ui'
+import Modal from '../three/Modal'
+import { COLORS, SIZES } from '../../constants/ui'
 
 interface ResultDialogProps {
   open: boolean

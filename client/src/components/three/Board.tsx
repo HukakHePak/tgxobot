@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import Cell from './Cell'
-import BoardField from './BoardField'
 import RocketModel from '../models/RocketModel'
 import PlanetModel, { PLANET_COLORS } from '../models/PlanetModel'
 import ResetModel from '../models/ResetModel'
@@ -61,8 +60,6 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
 
         <group position={[0, 0, 0]}>
-          <BoardField />
-
           {positions.map((pos, i) => (
             <group key={i}>
               <Cell
@@ -92,7 +89,7 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
             <ResetModel scale={0.85} y={0.0} onClick={reset} />
           </group>
 
-          <LogoSprite position={[0, 4.5, -3.2]} scale={[3.5, 1.75, 1]} />
+          <LogoSprite position={[0, 0, -10]} scale={[5, 2, 1]} />
         </group>
 
         <OrbitControls enablePan={false} enableRotate={true} maxDistance={80} minDistance={12} />
