@@ -19,7 +19,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/api/send-result', sendResultHandler);
+// nginx already routes /api/* -> backend, expose endpoint without the /api prefix
+app.post('/send-result', sendResultHandler);
 
 
 const PORT = Number(process.env.PORT) || 3001;

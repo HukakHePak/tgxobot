@@ -22,7 +22,7 @@ export default function Game() {
   return (
     <Box sx={{ width: '100%' }}>
       <div className="full-canvas">
-        <ThreeBoard squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} />
+        <ThreeBoard squares={squares} onClick={handleClick} disabled={!!result || !isPlayerTurn} reset={reset} />
       </div>
       <ResultDialog open={!!result} result={result} promo={promo} onReset={reset} />
     </Box>

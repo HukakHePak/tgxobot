@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useMemo } from 'react'
 import GenericModel from './GenericModel'
 import { resolveAssetUrl } from './assetResolver'
+import AnimatedModel from './AnimatedModel'
 
 export const PLANET_COLORS = ['blue', 'green', 'purple', 'red'] as const
 
@@ -15,9 +16,18 @@ export default function PlanetModel({ color = 'blue', scale = 0.35 }: { color?: 
   const url = COLOR_TO_URL[color] ?? COLOR_TO_URL['blue']
   if (!url) return null
 
+  // randomize rotation direction per instance
+  const sign = useMemo(() => (Math.random() < 0.5 ? -1 : 1), [])
+  // planets rotate slower than rockets
+  const initialSpin = 2.5 * sign
+  const finalSpin = 0.25 * sign
+
   return (
     <Suspense fallback={null}>
-      <GenericModel url={url} scale={scale} position={[0, 0, 0]} />
+      <AnimatedModel finalScale={scale} initialSpin={initialSpin} finalSpin={finalSpin} appearRate={1.8}>
+        {/* GenericModel scale is 1; AnimatedModel handles visible scaling */}
+        <GenericModel url={url} scale={1} position={[0, 0, 0]} />
+      </AnimatedModel>
     </Suspense>
   )
 }
