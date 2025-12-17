@@ -27,15 +27,15 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
   }
 
   return (
-    <Modal open={open} title={result === 'win' ? 'You won!' : 'You lost'} message={result === 'win' ? (promo ?? '') : 'Better luck — try again'} onClose={onReset}>
+    <Modal open={open} title={result === 'win' ? 'Hooray — you won!' : 'So close — nice try!'} message={result === 'win' ? (promo ?? '') : "Not this time — but you did great. Try again?"} onClose={onReset}>
       {/* content rendered as children so Modal is purely presentational */}
       <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <div style={{ width: SIZES.modalWidth, padding: '16px 20px', borderRadius: 8, background: 'transparent', boxShadow: 'none', border: 'none', color: COLORS.text, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{ margin: 0, marginBottom: 8, color: '#ffffff', textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'You won!' : 'You lost'}</h2>
+          <h2 style={{ margin: 0, marginBottom: 8, color: '#ffffff', textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'Hooray — you won!' : 'So close — nice try!'}</h2>
 
           {result === 'win' ? (
             <div style={{ marginTop: 8 }}>
-              <div style={{ color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Your promo code</div>
+              <div style={{ color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Here’s your promo code — enjoy!</div>
               <div
                 onClick={handleCopy}
                 role="button"
@@ -56,10 +56,10 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
               >
                 {promo}
               </div>
-              {copied && <div style={{ color: COLORS.success, marginTop: 8 }}>Copied!</div>}
+              {copied && <div style={{ color: '#ffffff', marginTop: 8, textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Code copied to clipboard! 💖</div>}
             </div>
           ) : (
-            <div style={{ marginTop: 12, color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Better luck — try again</div>
+            <div style={{ marginTop: 12, color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Not this time — you were so close. Give it another go?</div>
           )}
 
           <div style={{ marginTop: 20, display: 'flex', gap: 12, justifyContent: 'center' }}>
