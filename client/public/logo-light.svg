@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OXO logo (outline)">
+  <defs>
+    <!-- Mask that defines the silhouette (white = visible, black = transparent). Inner circle is black to create a hole. -->
+    <mask id="silhouetteMask" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="80">
+      <rect x="0" y="0" width="200" height="80" fill="black" />
+      <g>
+        <circle cx="28" cy="28" r="24" fill="white" />
+        <circle cx="28" cy="28" r="16" fill="black" />
+        <rect x="28" y="4" width="12" height="36" rx="3" fill="white" transform="rotate(45 28 28)" />
+        <g transform="translate(88,10)">
+          <text x="0" y="34" font-family="Inter, Roboto, sans-serif" font-size="36" font-weight="700" fill="white">OXO</text>
+        </g>
+      </g>
+    </mask>
+
+    <!-- Filter: dilate the masked silhouette and subtract original to produce an outer outline -->
+    <filter id="outline" x="-30%" y="-30%" width="160%" height="160%" primitiveUnits="userSpaceOnUse">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="DILATED" />
+      <feComposite in="DILATED" in2="SourceAlpha" operator="out" result="OUTLINE" />
+      <feFlood flood-color="#ffffff" result="WHITE" />
+      <feComposite in="WHITE" in2="OUTLINE" operator="in" result="OUTLINE_COLOR" />
+      <feMerge>
+        <feMergeNode in="OUTLINE_COLOR" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="300" height="80" rx="12" fill="transparent" />
+
+  <g transform="translate(18,8)">
+    <!-- Draw a solid rectangle and mask it to the silhouette, then apply outline filter to that result -->
+    <g filter="url(#outline)">
+      <rect x="0" y="0" width="200" height="80" fill="#000" mask="url(#silhouetteMask)" />
+    </g>
+  </g>
+</svg>

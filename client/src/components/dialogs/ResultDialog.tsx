@@ -31,11 +31,11 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
       {/* content rendered as children so Modal is purely presentational */}
       <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <div style={{ width: SIZES.modalWidth, padding: '16px 20px', borderRadius: 8, background: 'transparent', boxShadow: 'none', border: 'none', color: COLORS.text, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{ margin: 0, marginBottom: 8, textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'You won!' : 'You lost'}</h2>
+          <h2 style={{ margin: 0, marginBottom: 8, color: '#ffffff', textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'You won!' : 'You lost'}</h2>
 
           {result === 'win' ? (
             <div style={{ marginTop: 8 }}>
-              <div style={{ color: COLORS.accent, textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Your promo code</div>
+              <div style={{ color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Your promo code</div>
               <div
                 onClick={handleCopy}
                 role="button"
@@ -59,7 +59,7 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
               {copied && <div style={{ color: COLORS.success, marginTop: 8 }}>Copied!</div>}
             </div>
           ) : (
-            <div style={{ marginTop: 12, color: COLORS.muted, textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Better luck — try again</div>
+            <div style={{ marginTop: 12, color: '#ffffff', textShadow: '0 4px 10px rgba(0,0,0,0.6)' }}>Better luck — try again</div>
           )}
 
           <div style={{ marginTop: 20, display: 'flex', gap: 12, justifyContent: 'center' }}>
@@ -68,7 +68,8 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
               style={{
                 padding: '8px 14px',
                 borderRadius: theme === 'light' ? 20 : 8,
-                background: 'linear-gradient(90deg, #3b82f6 0%, #7c3aed 100%)',
+                // lavender button in light theme (improves contrast on pink background)
+                background: theme === 'light' ? '#CDB4FF' : 'linear-gradient(90deg, #3b82f6 0%, #7c3aed 100%)',
                 border: 'none',
                 color: '#ffffff',
                 cursor: 'pointer',

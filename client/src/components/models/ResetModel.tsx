@@ -293,7 +293,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           <primitive object={ringGeom} attach="geometry" />
           <meshStandardMaterial color={'#900000'} metalness={0.25} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={ringEdgeRef} geometry={ringEdgesGeom} renderOrder={999}>
-            <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
+            <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} toneMapped={false} />
           </lineSegments>
         </mesh>
 
@@ -308,7 +308,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           <primitive object={triGeom} attach="geometry" />
           <meshStandardMaterial color={'#900000'} metalness={0.35} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={triEdgeRef} geometry={triEdgesGeom} renderOrder={999}>
-            <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
+            <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} toneMapped={false} />
           </lineSegments>
         </mesh>
 

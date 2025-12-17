@@ -7,7 +7,8 @@ export const COLORS = {
   promo: '#ffd166',
   accent: '#9ad7ff',
   success: '#a7f3d0',
-  muted: '#9fb3c8'
+  // muted used in light modal text; switch to lavender for better contrast
+  muted: '#CDB4FF'
 }
 
 export const SIZES = {

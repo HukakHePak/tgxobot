@@ -74,9 +74,11 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
       >
         {theme === 'light' ? (
           <>
-            <ambientLight intensity={1.0} />
-            <hemisphereLight skyColor={'#FFFFFF'} groundColor={'#FFF5F8'} intensity={0.5} />
-            <directionalLight position={[10, 20, 10]} intensity={0.6} />
+            <ambientLight intensity={1.2} />
+            <hemisphereLight skyColor={'#FFFFFF'} groundColor={'#FFF5F8'} intensity={0.6} />
+            <directionalLight position={[10, 20, 10]} intensity={1.0} castShadow={false} />
+            <directionalLight position={[-6, 10, -6]} intensity={0.5} />
+            <pointLight position={[0, 30, 0]} intensity={0.4} color={'#ffffff'} />
             <Stars radius={50} depth={50} count={5000} factor={4} saturation={0} fade />
           </>
         ) : (
