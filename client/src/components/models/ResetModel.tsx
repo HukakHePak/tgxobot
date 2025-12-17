@@ -202,58 +202,39 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
 
   const { theme } = useTheme()
 
-  // overlay shader uniforms (rim only — match RoundedCell)
-  const overlayUniforms = React.useRef({
-    uTime: { value: 0 },
-    uColor: { value: new THREE.Color(0xffffff) },
-    uPower: { value: 2.2 },
-    uRimStrength: { value: 1.0 },
-  })
-
-  const overlayMat = React.useRef(
-    new THREE.ShaderMaterial({
-      uniforms: overlayUniforms.current,
-      vertexShader: `
-        varying vec3 vNormal;
-        varying vec3 vViewDir;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          vViewDir = normalize(-mvPosition.xyz);
-          gl_Position = projectionMatrix * mvPosition;
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform vec3 uColor;
-        uniform float uPower;
-        uniform float uRimStrength;
-        varying vec3 vNormal;
-        varying vec3 vViewDir;
-        void main() {
-          float fresnel = pow(1.0 - max(0.0, dot(vNormal, vViewDir)), uPower);
-          float rim = uRimStrength * fresnel;
-          // boost rim color slightly for visibility
-          vec3 col = uColor * rim * 1.25;
-          // output additive rim (alpha used lightly)
-          gl_FragColor = vec4(col, clamp(rim * 1.25, 0.0, 1.0));
-        }
-      `,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-  )
+  // (no overlay shader here) reset button uses edge lines similar to dark theme
 
 
   React.useEffect(() => {
     if (ringEdgeRef.current) (ringEdgeRef.current as any).raycast = () => null
     if (triEdgeRef.current) (triEdgeRef.current as any).raycast = () => null
-    // hide edge shader visuals for light theme
-    if (ringEdgeRef.current) ringEdgeRef.current.visible = theme !== 'light'
-    if (triEdgeRef.current) triEdgeRef.current.visible = theme !== 'light'
-    if (ringEdgeMat.current) ringEdgeMat.current.opacity = theme === 'light' ? 0 : ringEdgeMat.current.opacity
-    if (triEdgeMat.current) triEdgeMat.current.opacity = theme === 'light' ? 0 : triEdgeMat.current.opacity
+    // always show edges; switch to white color in light theme
+    if (ringEdgeRef.current) ringEdgeRef.current.visible = true
+    if (triEdgeRef.current) triEdgeRef.current.visible = true
+    if (ringEdgeMat.current) {
+      if (theme === 'light') {
+        ringEdgeMat.current.vertexColors = false
+        ringEdgeMat.current.color.set('#ffffff')
+        ringEdgeMat.current.opacity = 1.0
+        ringEdgeMat.current.transparent = false
+      } else {
+        ringEdgeMat.current.vertexColors = true
+        ringEdgeMat.current.transparent = true
+      }
+      ringEdgeMat.current.needsUpdate = true
+    }
+    if (triEdgeMat.current) {
+      if (theme === 'light') {
+        triEdgeMat.current.vertexColors = false
+        triEdgeMat.current.color.set('#ffffff')
+        triEdgeMat.current.opacity = 1.0
+        triEdgeMat.current.transparent = false
+      } else {
+        triEdgeMat.current.vertexColors = true
+        triEdgeMat.current.transparent = true
+      }
+      triEdgeMat.current.needsUpdate = true
+    }
   }, [theme])
 
   useFrame((state) => {
@@ -265,17 +246,24 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
     group.current.rotation.y += 0.01
     const t = state.clock.getElapsedTime()
     if (ringEdgeMat.current) {
-      const base = hover.current ? 0.7 : 0.22
-      const pulse = 0.5 + 0.5 * Math.sin(t * 3.0)
-      ringEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      if (theme === 'light') {
+        // static white lines in light theme
+        ringEdgeMat.current.opacity = 0.85
+      } else {
+        const base = hover.current ? 0.7 : 0.22
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3.0)
+        ringEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      }
     }
     if (triEdgeMat.current) {
-      const base = hover.current ? 0.7 : 0.22
-      const pulse = 0.5 + 0.5 * Math.sin(t * 3.2 + 0.9)
-      triEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      if (theme === 'light') {
+        triEdgeMat.current.opacity = 0.85
+      } else {
+        const base = hover.current ? 0.7 : 0.22
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3.2 + 0.9)
+        triEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      }
     }
-    // update overlay shader time
-    overlayUniforms.current.uTime.value = state.clock.getElapsedTime()
   })
 
   // position and orientation for the triangular arrowhead at arc end
@@ -303,7 +291,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
         {/* extruded ring (keeps the missing segment) */}
         <mesh position={[0, 0.01 * s, 0]}>
           <primitive object={ringGeom} attach="geometry" />
-          <primitive object={overlayMat.current} attach="material" />
+          <meshStandardMaterial color={'#900000'} metalness={0.25} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={ringEdgeRef} geometry={ringEdgesGeom} renderOrder={999}>
             <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
           </lineSegments>
@@ -318,7 +306,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           rotation={[0, yAngle, 0]}
         >
           <primitive object={triGeom} attach="geometry" />
-          <primitive object={overlayMat.current} attach="material" />
+          <meshStandardMaterial color={'#900000'} metalness={0.35} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={triEdgeRef} geometry={triEdgesGeom} renderOrder={999}>
             <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
           </lineSegments>
