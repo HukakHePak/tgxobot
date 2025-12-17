@@ -7,7 +7,7 @@ type RotatingCellProps = {
   scale?: number
 }
 
-export default function RotatingCell({ scale = 1.2 }: RotatingCellProps) {
+export default function RotatingCell({ scale = 1.8 }: RotatingCellProps) {
   const ref = useRef<any>(null)
   const seed = useMemo(() => Math.random() * 10, [])
 
@@ -22,19 +22,18 @@ export default function RotatingCell({ scale = 1.2 }: RotatingCellProps) {
   return (
     <group ref={ref} position={[0, 0, 0]} scale={[scale, scale, scale]}>
       <Cell
-        idx={-999}
+        idx={0}
         value={null}
         position={[0, 0, 0]}
-        onClick={() => {}}
-        disabled={true}
-        disableHover={true}
-        showEdges={true}
-        edgeColor="#ffd166"
-        cellColor={COLORS.modalBg}
-        cellEmissive={COLORS.modalBg}
+        onClick={() => { }}
+        disabled
+        disableHover
+        showEdges
         showFill={true}
-        edgeBaseOpacity={0.9}
-        fillOpacity={0.5}
+        cellColor={'#071025'}
+        cellEmissive={'#071025'}
+        edgeBaseOpacity={0.45}
+        fillOpacity={0.7}
       />
     </group>
   )

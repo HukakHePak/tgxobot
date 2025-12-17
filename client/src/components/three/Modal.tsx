@@ -15,12 +15,10 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children }) => {
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto', zIndex: 1 }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} onClick={onClose} />
+      <div style={{ position: 'absolute', inset: 0, background: 'transparent' }} onClick={onClose} />
 
       <div style={{ width: '100vw', height: '100vh', position: 'relative', zIndex: 1, borderRadius: 0, overflow: 'hidden' }}>
           <Canvas style={{ background: 'transparent', width: '100vw', height: '100vh' }} gl={{ alpha: true }} camera={{ position: [0, 0, 12], fov: 50 }}>
-            <ambientLight intensity={0.75} />
-            <directionalLight position={[10, 10, 5]} intensity={1.0} />
             <RotatingCell />
           </Canvas>
 
