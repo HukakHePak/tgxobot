@@ -13,9 +13,11 @@ type CellProps = {
   cellColor?: string
   cellEmissive?: string
   showFill?: boolean
+  edgeBaseOpacity?: number
+  fillOpacity?: number
 }
 
-export default function Cell({ idx, value, position, onClick, disabled, showEdges = true, edgeColor, cellColor, cellEmissive, showFill = false }: CellProps) {
+export default function Cell({ idx, value, position, onClick, disabled, showEdges = true, edgeColor, cellColor, cellEmissive, showFill = false, edgeBaseOpacity, fillOpacity }: CellProps) {
   const mesh = useRef<THREE.Mesh>(null!)
   const hover = useRef(false)
   const edgeRef = useRef<THREE.LineSegments>(null!)
@@ -74,7 +76,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
 
     // animate edge glow opacity (simple pulsing shimmer)
     if (edgeMatRef.current) {
-      const base = hover.current ? 0.6 : 0.18
+      const base = hover.current ? 0.6 : (typeof (edgeBaseOpacity) === 'number' ? edgeBaseOpacity : 0.18)
       const pulse = 0.5 + 0.5 * Math.sin(t * 3.0 + idx * 0.7)
       edgeMatRef.current.opacity = Math.min(1, base + pulse * 0.6)
     }
@@ -101,9 +103,10 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
             // give a small emissive tint when filled so dark-blue is visible under lighting
             emissive={cellEmissive ?? (showFill ? (cellColor ?? '#0b1220') : '#000000')}
             emissiveIntensity={showFill ? 0.08 : 0}
-            transparent={!showFill}
-            opacity={showFill ? 1 : 0}
-            depthWrite={showFill}
+            // allow explicit fill opacity; default to 1 when showFill is true
+            transparent={typeof fillOpacity === 'number' ? fillOpacity < 1 : !showFill}
+            opacity={typeof fillOpacity === 'number' ? fillOpacity : (showFill ? 1 : 0)}
+            depthWrite={typeof fillOpacity === 'number' ? fillOpacity === 1 : showFill}
           />
         </mesh>
 
