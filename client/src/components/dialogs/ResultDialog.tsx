@@ -25,10 +25,9 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Modal open={open} title={result === 'win' ? 'You won!' : 'You lost'} message={result === 'win' ? (promo ?? '') : 'Better luck — try again'} onClose={onReset} />
-
-      <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
+    <Modal open={open} title={result === 'win' ? 'You won!' : 'You lost'} message={result === 'win' ? (promo ?? '') : 'Better luck — try again'} onClose={onReset}>
+      {/* content rendered as children so Modal is purely presentational */}
+      <div style={{ position: 'relative', zIndex: 2, pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <div style={{ width: SIZES.modalWidth, padding: '16px 20px', borderRadius: 8, background: 'transparent', boxShadow: 'none', border: 'none', color: COLORS.text, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h2 style={{ margin: 0, marginBottom: 8, textShadow: '0 6px 18px rgba(2,6,23,0.8), 0 0 12px rgba(59,130,246,0.15)' }}>{result === 'win' ? 'You won!' : 'You lost'}</h2>
 
@@ -79,7 +78,8 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
           </div>
         </div>
       </div>
-    </div>
+      {/* decorative 3D content is handled by Modal's Canvas */}
+    </Modal>
   )
 }
 
