@@ -24,8 +24,36 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
 
   const edgesGeom = useMemo(() => {
     const geo = new THREE.BoxGeometry(2.8, 0.4, 2.8)
-    return new THREE.EdgesGeometry(geo)
-  }, [])
+    const edges = new THREE.EdgesGeometry(geo)
+    // add per-vertex colors to create a pearlescent, non-uniform gradient
+    const pos = edges.attributes.position
+    const count = pos.count
+    const colors = new Float32Array(count * 3)
+    const baseA = new THREE.Color(edgeColor ?? (value === 'X' ? '#7dd3fc' : value === 'O' ? '#7c3aed' : '#7dd3fc'))
+    const baseB = new THREE.Color('#7c3aed')
+    for (let i = 0; i < count; i++) {
+      const x = pos.getX(i)
+      const y = pos.getY(i)
+      const z = pos.getZ(i)
+      // deterministic seed per vertex
+      const s = Math.abs(Math.sin((x * 12.9898 + y * 78.233 + z * 45.164 + idx * 3.1415))) % 1
+      const mixv = 0.25 + 0.7 * s
+      // mix base colors
+      let r = baseA.r * (1 - mixv) + baseB.r * mixv
+      let g = baseA.g * (1 - mixv) + baseB.g * mixv
+      let b = baseA.b * (1 - mixv) + baseB.b * mixv
+      // add subtle pearlescent shift towards white based on another pattern
+      const pearl = 0.12 * Math.abs(Math.sin(s * Math.PI * 2 + idx * 0.37))
+      r = r + (1.0 - r) * pearl
+      g = g + (1.0 - g) * pearl
+      b = b + (1.0 - b) * pearl
+      colors[i * 3 + 0] = r
+      colors[i * 3 + 1] = g
+      colors[i * 3 + 2] = b
+    }
+    edges.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    return edges
+  }, [idx, value, edgeColor])
 
   useEffect(() => {
     // prevent edge lines from intercepting pointer events so hover remains on the group/mesh
@@ -84,10 +112,9 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
           <lineSegments ref={edgeRef} geometry={edgesGeom} renderOrder={999}>
             <lineBasicMaterial
               ref={edgeMatRef as any}
-              color={edgeColor ?? (value === 'X' ? '#7dd3fc' : value === 'O' ? '#ffd166' : '#ffffff')}
+              vertexColors={true}
               transparent={true}
-              opacity={0.2}
-              linewidth={1}
+              opacity={0.85}
             />
           </lineSegments>
         ) : null}
