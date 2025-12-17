@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTheme } from '../../theme/ThemeContext'
 import Modal from '../three/Modal'
 import { COLORS, SIZES } from '../../constants/ui'
 
@@ -12,6 +13,7 @@ interface ResultDialogProps {
 export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo, onReset }) => {
   if (!open) return null
   const [copied, setCopied] = useState(false)
+  const { theme } = useTheme()
 
   const handleCopy = async () => {
     if (!promo) return
@@ -65,7 +67,7 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
               onClick={onReset}
               style={{
                 padding: '8px 14px',
-                borderRadius: 8,
+                borderRadius: theme === 'light' ? 20 : 8,
                 background: 'linear-gradient(90deg, #3b82f6 0%, #7c3aed 100%)',
                 border: 'none',
                 color: '#ffffff',

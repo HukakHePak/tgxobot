@@ -1,6 +1,7 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useTheme } from '../../theme/ThemeContext'
 
 type ResetModelProps = {
   scale?: number
@@ -199,10 +200,61 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
   const triEdgeRef = React.useRef<THREE.LineSegments>(null!)
   const triEdgeMat = React.useRef<THREE.LineBasicMaterial>(null!)
 
+  const { theme } = useTheme()
+
+  // overlay shader uniforms (rim only — match RoundedCell)
+  const overlayUniforms = React.useRef({
+    uTime: { value: 0 },
+    uColor: { value: new THREE.Color(0xffffff) },
+    uPower: { value: 2.2 },
+    uRimStrength: { value: 1.0 },
+  })
+
+  const overlayMat = React.useRef(
+    new THREE.ShaderMaterial({
+      uniforms: overlayUniforms.current,
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPosition.xyz);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor;
+        uniform float uPower;
+        uniform float uRimStrength;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float fresnel = pow(1.0 - max(0.0, dot(vNormal, vViewDir)), uPower);
+          float rim = uRimStrength * fresnel;
+          // boost rim color slightly for visibility
+          vec3 col = uColor * rim * 1.25;
+          // output additive rim (alpha used lightly)
+          gl_FragColor = vec4(col, clamp(rim * 1.25, 0.0, 1.0));
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  )
+
+
   React.useEffect(() => {
     if (ringEdgeRef.current) (ringEdgeRef.current as any).raycast = () => null
     if (triEdgeRef.current) (triEdgeRef.current as any).raycast = () => null
-  }, [])
+    // hide edge shader visuals for light theme
+    if (ringEdgeRef.current) ringEdgeRef.current.visible = theme !== 'light'
+    if (triEdgeRef.current) triEdgeRef.current.visible = theme !== 'light'
+    if (ringEdgeMat.current) ringEdgeMat.current.opacity = theme === 'light' ? 0 : ringEdgeMat.current.opacity
+    if (triEdgeMat.current) triEdgeMat.current.opacity = theme === 'light' ? 0 : triEdgeMat.current.opacity
+  }, [theme])
 
   useFrame((state) => {
     if (!group.current) return
@@ -222,6 +274,8 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
       const pulse = 0.5 + 0.5 * Math.sin(t * 3.2 + 0.9)
       triEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
     }
+    // update overlay shader time
+    overlayUniforms.current.uTime.value = state.clock.getElapsedTime()
   })
 
   // position and orientation for the triangular arrowhead at arc end
@@ -249,7 +303,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
         {/* extruded ring (keeps the missing segment) */}
         <mesh position={[0, 0.01 * s, 0]}>
           <primitive object={ringGeom} attach="geometry" />
-          <meshStandardMaterial color={'#900000'} metalness={0.25} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
+          <primitive object={overlayMat.current} attach="material" />
           <lineSegments ref={ringEdgeRef} geometry={ringEdgesGeom} renderOrder={999}>
             <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
           </lineSegments>
@@ -264,7 +318,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           rotation={[0, yAngle, 0]}
         >
           <primitive object={triGeom} attach="geometry" />
-          <meshStandardMaterial color={'#900000'} metalness={0.35} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
+          <primitive object={overlayMat.current} attach="material" />
           <lineSegments ref={triEdgeRef} geometry={triEdgesGeom} renderOrder={999}>
             <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
           </lineSegments>
