@@ -5,6 +5,7 @@ import Cell from './three/Cell'
 import BoardField from './three/BoardField'
 import RocketModel from './models/RocketModel'
 import PlanetModel, { PLANET_COLORS } from './models/PlanetModel'
+import ResetModel from './models/ResetModel'
 
 type Square = 'X' | 'O' | null
 
@@ -12,11 +13,12 @@ interface ThreeBoardProps {
   squares: Square[]
   onClick: (index: number) => void
   disabled?: boolean
+  reset: () => void
 }
 
 const PLANET_COUNT = 4
 
-export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabled }) => {
+export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabled, reset }) => {
   const positions = [
     [-3.2, 0, -3.2],
     [0, 0, -3.2],
@@ -89,6 +91,12 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
             )}
           </group>
         ))}
+
+        {/* Reset model centered below the board and moved further away */}
+        <group key="reset" position={[0, 0, 6.2]}>
+          {/* y set near 0 so cone is at cell level but model lowered slightly */}
+          <ResetModel scale={0.85} y={0.0} onClick={reset} />
+        </group>
 
         <OrbitControls enablePan={false} maxDistance={48} minDistance={12} />
       </Canvas>
