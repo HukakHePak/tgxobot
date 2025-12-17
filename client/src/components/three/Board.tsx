@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import Cell from './Cell'
+import RoundedCell from './RoundedCell'
 import RocketModel from '../models/RocketModel'
 import PlanetModel, { PLANET_COLORS } from '../models/PlanetModel'
 import BananaModel from '../models/BananaModel'
@@ -88,14 +89,25 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
         <group position={[0, 0, 0]}>
           {positions.map((pos, i) => (
             <group key={i}>
-              <Cell
-                idx={i}
-                value={squares[i]}
-                position={pos}
-                onClick={onClick}
-                disabled={disabled}
-                edgeColor={squares[i] === 'X' ? '#7dd3fc' : squares[i] === 'O' ? '#ffd166' : undefined}
-              />
+              {theme === 'light' ? (
+                <RoundedCell
+                  idx={i}
+                  value={squares[i]}
+                  position={pos}
+                  onClick={onClick}
+                  disabled={disabled}
+                  cellColor={'#ffffff'}
+                />
+              ) : (
+                <Cell
+                  idx={i}
+                  value={squares[i]}
+                  position={pos}
+                  onClick={onClick}
+                  disabled={disabled}
+                  edgeColor={squares[i] === 'X' ? '#7dd3fc' : squares[i] === 'O' ? '#ffd166' : undefined}
+                />
+              )}
 
               {squares[i] === 'X' && (
                 <group position={pos}>
