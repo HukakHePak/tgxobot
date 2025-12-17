@@ -4,6 +4,9 @@ import { OrbitControls, Stars } from '@react-three/drei'
 import Cell from './Cell'
 import RocketModel from '../models/RocketModel'
 import PlanetModel, { PLANET_COLORS } from '../models/PlanetModel'
+import BananaModel from '../models/BananaModel'
+import DonutModel from '../models/DonutModel'
+import { useTheme } from '../../theme/ThemeContext'
 import ResetModel from '../models/ResetModel'
 import LogoSprite from './LogoSprite'
 
@@ -46,8 +49,21 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
     prevSquaresRef.current = [...squares]
   }, [squares])
 
+  const { theme } = useTheme()
+
+  const containerStyle: React.CSSProperties = theme === 'light'
+    ? {
+        width: '100%',
+        height: '100vh',
+        boxSizing: 'border-box',
+        backgroundImage: `linear-gradient(150deg, #ffd1dcff 0%, #FFB3C7 60%)`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }
+    : { width: '100%', height: '100vh', boxSizing: 'border-box', background: '#0b1220' }
+
   return (
-    <div style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
+    <div style={containerStyle}>
       <Canvas
         camera={{ position: [0, 40, 0], fov: 50 }}
         onCreated={({ camera }) => {
@@ -55,9 +71,19 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
           camera.lookAt(0, 0, 0)
         }}
       >
-        <ambientLight intensity={0.6} />
-
-        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
+        {theme === 'light' ? (
+          <>
+            <ambientLight intensity={1.0} />
+            <hemisphereLight skyColor={'#FFFFFF'} groundColor={'#FFF5F8'} intensity={0.5} />
+            <directionalLight position={[10, 20, 10]} intensity={0.6} />
+            <Stars radius={50} depth={50} count={5000} factor={4} saturation={0} fade />
+          </>
+        ) : (
+          <>
+            <ambientLight intensity={0.6} />
+            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
+          </>
+        )}
 
         <group position={[0, 0, 0]}>
           {positions.map((pos, i) => (
@@ -73,13 +99,13 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
 
               {squares[i] === 'X' && (
                 <group position={pos}>
-                  <RocketModel scale={0.4} y={0} />
+                  {theme === 'light' ? <BananaModel scale={0.45} /> : <RocketModel scale={0.4} y={0} />}
                 </group>
               )}
 
               {squares[i] === 'O' && (
                 <group position={pos}>
-                  <PlanetModel color={planetColor} scale={0.4} />
+                  {theme === 'light' ? <DonutModel color={planetColor} scale={0.36} /> : <PlanetModel color={planetColor} scale={0.4} />}
                 </group>
               )}
             </group>
