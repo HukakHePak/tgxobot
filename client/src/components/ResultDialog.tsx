@@ -26,7 +26,7 @@ export const ResultDialog: React.FC<ResultDialogProps> = ({ open, result, promo,
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 1400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ position: 'absolute', inset: 0 }}>
-        <ThreeModalCanvas />
+        <ThreeModalCanvas value={result === 'win' ? 'X' : result === 'loss' ? 'O' : null} />
       </div>
 
       <div style={{ position: 'relative', zIndex: 2, width: 'auto', padding: 0, borderRadius: 0, background: 'transparent', boxShadow: 'none', border: 'none', color: '#e6eef8', textAlign: 'center', pointerEvents: 'auto' }}>

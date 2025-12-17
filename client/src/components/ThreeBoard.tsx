@@ -65,8 +65,6 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
         }}
       >
         <ambientLight intensity={0.6} />
-        <pointLight position={[10, 20, 10]} intensity={1.2} />
-        <pointLight position={[-10, 10, -10]} intensity={0.6} />
 
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
 
@@ -74,7 +72,15 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
 
         {positions.map((pos, i) => (
           <group key={i}>
-            <Cell idx={i} value={squares[i]} position={pos} onClick={onClick} disabled={disabled} />
+            {/* edgeColor set from cell value so rim matches highlighted/selected cell */}
+            <Cell
+              idx={i}
+              value={squares[i]}
+              position={pos}
+              onClick={onClick}
+              disabled={disabled}
+              edgeColor={squares[i] === 'X' ? '#7dd3fc' : squares[i] === 'O' ? '#ffd166' : undefined}
+            />
 
             {squares[i] === 'X' && (
               <group position={pos}>
