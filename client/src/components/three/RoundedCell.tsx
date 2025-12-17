@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import CellBase, { CellProps } from './CellBase'
 import { RoundedBox } from '@react-three/drei'
 
 export default function RoundedCell(props: CellProps & { radius?: number; smoothness?: number }) {
-  const { showFill = false, fillOpacity, cellColor, cellEmissive, radius = 0.5, smoothness = 10 } = props
+  const { value, radius = 0.5, smoothness = 10 } = props
   // overlay shader uniforms (rim only)
   const overlayUniforms = useRef({
     uTime: { value: 0 },
@@ -52,6 +52,20 @@ export default function RoundedCell(props: CellProps & { radius?: number; smooth
   useFrame((state) => {
     overlayUniforms.current.uTime.value = state.clock.getElapsedTime()
   })
+
+  
+  useEffect(() => {
+    // swapped colors and softened tones
+    if (value === 'X') {
+      // pale gold
+      overlayUniforms.current.uColor.value.set('#ffe9c9')
+    } else if (value === 'O') {
+      // pale pink (replaces lavender)
+      overlayUniforms.current.uColor.value.set('#ffd1e9')
+    } else {
+      overlayUniforms.current.uColor.value.set('#ffffff')
+    }
+  }, [value])
 
   return (
     <CellBase {...props} showEdges={false}>
