@@ -1,11 +1,20 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
+import * as THREE from 'three'
 import Cell from './three/Cell'
-import BoardField from './three/BoardField'
 import RocketModel from './models/RocketModel'
 import PlanetModel, { PLANET_COLORS } from './models/PlanetModel'
 import ResetModel from './models/ResetModel'
+
+function LogoSprite({ position = [0, 6, 0], scale = [4, 2, 1] as any }: { position?: [number, number, number]; scale?: [number, number, number] }) {
+  const tex = useLoader(THREE.TextureLoader, '/logo.svg')
+  return (
+    <sprite position={position as any} scale={scale as any}>
+      <spriteMaterial map={tex} transparent depthWrite={false} />
+    </sprite>
+  )
+}
 
 type Square = 'X' | 'O' | null
 
@@ -65,38 +74,42 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
 
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
 
-        <BoardField />
+        {/* Group containing board and related items — logo will be inside this group so it rotates together */}
+        <group position={[0, 0, 0]}>
+          {positions.map((pos, i) => (
+            <group key={i}>
+              {/* edgeColor set from cell value so rim matches highlighted/selected cell */}
+              <Cell
+                idx={i}
+                value={squares[i]}
+                position={pos}
+                onClick={onClick}
+                disabled={disabled}
+                edgeColor={squares[i] === 'X' ? '#7dd3fc' : squares[i] === 'O' ? '#ffd166' : undefined}
+              />
 
-        {positions.map((pos, i) => (
-          <group key={i}>
-            {/* edgeColor set from cell value so rim matches highlighted/selected cell */}
-            <Cell
-              idx={i}
-              value={squares[i]}
-              position={pos}
-              onClick={onClick}
-              disabled={disabled}
-              edgeColor={squares[i] === 'X' ? '#7dd3fc' : squares[i] === 'O' ? '#ffd166' : undefined}
-            />
+              {squares[i] === 'X' && (
+                <group position={pos}>
+                  <RocketModel scale={0.4} y={0} />
+                </group>
+              )}
 
-            {squares[i] === 'X' && (
-              <group position={pos}>
-                <RocketModel scale={0.4} y={0} />
-              </group>
-            )}
+              {squares[i] === 'O' && (
+                <group position={pos}>
+                  <PlanetModel color={planetColor} scale={0.4} />
+                </group>
+              )}
+            </group>
+          ))}
 
-            {squares[i] === 'O' && (
-              <group position={pos}>
-                <PlanetModel color={planetColor} scale={0.4} />
-              </group>
-            )}
+          {/* Reset model centered below the board and moved further away */}
+          <group key="reset" position={[0, -0.1, 7.2]}>
+            {/* y set near 0 so cone is at cell level but model lowered slightly */}
+            <ResetModel scale={0.85} y={0.0} onClick={reset} />
           </group>
-        ))}
 
-        {/* Reset model centered below the board and moved further away */}
-        <group key="reset" position={[0, 0, 6.2]}>
-          {/* y set near 0 so cone is at cell level but model lowered slightly */}
-          <ResetModel scale={0.85} y={0.0} onClick={reset} />
+          {/* Logo sprite positioned above the top-center cell so it sits over the board's top middle */}
+          <LogoSprite position={[0, 0, -8]} scale={[5, 2, 1]} />
         </group>
 
         <OrbitControls enablePan={false} enableRotate={true} maxDistance={80} minDistance={12} />
