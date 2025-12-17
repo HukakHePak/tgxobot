@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { getTelegramChatId } from '../api/telegram';
 import { sendResult } from '../api/sendResult';
-import ThreeBoard from './ThreeBoard';
+import ThreeBoard from './three/Board';
 import { ResultDialog } from './ResultDialog';
 import { useTicTacToe } from '../hooks/useTicTacToeReducer';
 

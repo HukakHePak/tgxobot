@@ -1,6 +1,7 @@
 import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { COLORS, SIZES } from '../../constants/ui'
 
 type CellProps = {
   idx: number
@@ -25,7 +26,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
   const transform = useRef<THREE.Group>(null!)
 
   const edgesGeom = useMemo(() => {
-    const geo = new THREE.BoxGeometry(2.8, 2.8, 2.8)
+    const geo = new THREE.BoxGeometry(SIZES.cellSize, SIZES.cellSize, SIZES.cellSize)
     const edges = new THREE.EdgesGeometry(geo)
     // add per-vertex colors to create a pearlescent, non-uniform gradient
     const pos = edges.attributes.position
@@ -99,7 +100,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
             // when showing fill (modal) use less metallic/more rough so color reads better
             metalness={showFill ? 0.2 : 0.8}
             roughness={showFill ? 0.6 : 0.2}
-            color={cellColor ?? '#0b1220'}
+            color={cellColor ?? COLORS.modalBg}
             // give a small emissive tint when filled so dark-blue is visible under lighting
             emissive={cellEmissive ?? (showFill ? (cellColor ?? '#0b1220') : '#000000')}
             emissiveIntensity={showFill ? 0.08 : 0}

@@ -2,6 +2,7 @@ import React, { Suspense, useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import Cell from './three/Cell'
 import { Group } from 'three'
+import { COLORS } from '../constants/ui'
 
 export default function ThreeModalCanvas({ value, result, promo, onReset }: { value?: 'X' | 'O' | null, result?: 'win' | 'loss' | null, promo?: string | null, onReset?: () => void }): JSX.Element {
   // Inner component that lives inside the Canvas so R3F hooks are valid
@@ -36,8 +37,8 @@ export default function ThreeModalCanvas({ value, result, promo, onReset }: { va
           onClick={() => {}}
           disabled
           showFill={true}
-          cellColor={'#071025'}
-          cellEmissive={'#071025'}
+          cellColor={COLORS.modalBg}
+          cellEmissive={COLORS.modalBg}
           edgeBaseOpacity={0.45}
           fillOpacity={0.5}
         />
