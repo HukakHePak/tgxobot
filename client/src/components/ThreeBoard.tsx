@@ -54,13 +54,10 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
   return (
     <div style={{ width: '100%', height: '100vh', boxSizing: 'border-box' }}>
       <Canvas
-        camera={{ position: [0, 24, 0], fov: 50 }}
+        camera={{ position: [0, 40, 0], fov: 50 }}
         onCreated={({ camera }) => {
-          const phi = (30 * Math.PI) / 180
-          const r = 30
-          const y = r * Math.cos(phi)
-          const z = r * Math.sin(phi)
-          camera.position.set(0, y, z)
+          // top-down view: place camera directly above the board and look at center
+          camera.position.set(0, 40, 0)
           camera.lookAt(0, 0, 0)
         }}
       >
@@ -84,15 +81,13 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
 
             {squares[i] === 'X' && (
               <group position={pos}>
-                <RocketModel scale={0.4} y={0.9} />
+                <RocketModel scale={0.4} y={0} />
               </group>
             )}
 
             {squares[i] === 'O' && (
               <group position={pos}>
-                <group position={[0, 1.05, 0]}>
-                  <PlanetModel color={planetColor} scale={0.4} />
-                </group>
+                <PlanetModel color={planetColor} scale={0.4} />
               </group>
             )}
           </group>
@@ -104,7 +99,7 @@ export const ThreeBoard: React.FC<ThreeBoardProps> = ({ squares, onClick, disabl
           <ResetModel scale={0.85} y={0.0} onClick={reset} />
         </group>
 
-        <OrbitControls enablePan={false} maxDistance={48} minDistance={12} />
+        <OrbitControls enablePan={false} enableRotate={true} maxDistance={80} minDistance={12} />
       </Canvas>
     </div>
   )

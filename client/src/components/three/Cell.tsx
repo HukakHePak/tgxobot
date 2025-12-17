@@ -23,7 +23,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
   const transform = useRef<THREE.Group>(null!)
 
   const edgesGeom = useMemo(() => {
-    const geo = new THREE.BoxGeometry(2.8, 0.4, 2.8)
+    const geo = new THREE.BoxGeometry(2.8, 2.8, 2.8)
     const edges = new THREE.EdgesGeometry(geo)
     // add per-vertex colors to create a pearlescent, non-uniform gradient
     const pos = edges.attributes.position
@@ -92,7 +92,7 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
         }}
       >
         <mesh ref={mesh}>
-          <boxGeometry args={[2.8, 0.4, 2.8]} />
+          <boxGeometry args={[2.8, 2.8, 2.8]} />
           <meshStandardMaterial
             // when showing fill (modal) use less metallic/more rough so color reads better
             metalness={showFill ? 0.2 : 0.8}
