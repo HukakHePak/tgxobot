@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="OXO icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="OXO icon (pink outline)">
   <defs>
-    <linearGradient id="g" x1="0" x2="1">
-      <stop offset="0" stop-color="#3b82f6"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
+    <!-- silhouette mask (white = visible) -->
+    <mask id="silhouetteMask" maskUnits="userSpaceOnUse" x="0" y="0" width="80" height="80">
+      <rect x="0" y="0" width="80" height="80" fill="black" />
+      <g>
+        <circle cx="32" cy="32" r="24" fill="white" />
+        <circle cx="32" cy="32" r="16" fill="black" />
+        <rect x="32" y="8" width="12" height="36" rx="3" fill="white" transform="rotate(45 32 32)" />
+      </g>
+    </mask>
+
+    <!-- outline filter using pink color -->
+    <filter id="outline" x="-30%" y="-30%" width="160%" height="160%" primitiveUnits="userSpaceOnUse">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1.8" result="DILATED" />
+      <feComposite in="DILATED" in2="SourceAlpha" operator="out" result="OUTLINE" />
+      <feFlood flood-color="#ffb3c7" result="PINK" />
+      <feComposite in="PINK" in2="OUTLINE" operator="in" result="OUTLINE_COLOR" />
+      <feMerge>
+        <feMergeNode in="OUTLINE_COLOR" />
+      </feMerge>
+    </filter>
   </defs>
+
+  <!-- background placeholder (transparent) -->
   <rect width="80" height="80" rx="12" fill="transparent" />
-  <g transform="translate(10,8)">
-    <circle cx="28" cy="28" r="24" fill="url(#g)" opacity="0.95" />
-    <circle cx="28" cy="28" r="16" fill="#071025" />
-    <rect x="28" y="4" width="12" height="36" rx="3" fill="#ffd166" transform="rotate(45 28 28)" />
+
+  <!-- apply outline by drawing a filled rect masked to the silhouette and using the filter to create an outer stroke -->
+  <g transform="translate(0,0)">
+    <g filter="url(#outline)">
+      <rect x="0" y="0" width="80" height="80" fill="#071025" mask="url(#silhouetteMask)" />
+    </g>
+    <!-- inner fill (cutout) -->
+    <g mask="url(#silhouetteMask)">
+      <rect x="0" y="0" width="80" height="80" fill="transparent" />
+    </g>
   </g>
 </svg>

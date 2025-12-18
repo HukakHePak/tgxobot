@@ -6,5 +6,5 @@ if (!BOT_TOKEN) {
 }
 
 export const bot = new Bot(BOT_TOKEN);
-bot.command('start', ctx => ctx.reply('Бот активен! Играйте на сайте.'));
+bot.command('start', ctx => ctx.reply("Hi! I'm here to help you play — open the app to get bonuses and a little happiness 🌸"));
 bot.start();

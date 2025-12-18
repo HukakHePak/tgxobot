@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="OXO splash (telegram)">
+  <defs>
+    <!-- Mask: silhouette of the logo (white = visible). We'll center and scale the original mark to the 512 canvas. -->
+    <mask id="silhouetteMask512" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect x="0" y="0" width="512" height="512" fill="black" />
+      <g transform="translate(256,256) scale(1.33333335) translate(-78.5,-28)">
+        <circle cx="28" cy="28" r="24" fill="white" />
+        <circle cx="28" cy="28" r="16" fill="black" />
+        <rect x="28" y="4" width="12" height="36" rx="3" fill="white" transform="rotate(45 28 28)" />
+        <!-- text included in the silhouette so it appears in the unified outline -->
+        <g transform="translate(88,10)">
+          <text x="0" y="34" font-family="Inter, Roboto, sans-serif" font-size="36" font-weight="700" fill="white">OXO</text>
+        </g>
+      </g>
+    </mask>
+
+    <!-- Outline filter: dilate then subtract to get outer stroke. Radius tuned for 512 scale -->
+    <filter id="outline512" x="-30%" y="-30%" width="160%" height="160%" primitiveUnits="userSpaceOnUse">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="DILATED" />
+      <feComposite in="DILATED" in2="SourceAlpha" operator="out" result="OUTLINE" />
+      <feFlood flood-color="#FFB3C7" result="PINK" />
+      <feComposite in="PINK" in2="OUTLINE" operator="in" result="OUTLINE_COLOR" />
+      <feMerge>
+        <feMergeNode in="OUTLINE_COLOR" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Transparent background (Telegram supports transparent PNG/SVG icons) -->
+  <rect width="512" height="512" fill="transparent" />
+
+  <!-- center the masked solid and apply outline filter to get unified contour in #FFB3C7 -->
+  <g>
+    <g filter="url(#outline512)">
+      <rect x="0" y="0" width="512" height="512" fill="#000" mask="url(#silhouetteMask512)" />
+    </g>
+  </g>
+</svg>

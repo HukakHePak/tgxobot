@@ -1,33 +1,18 @@
 import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { SIZES } from '../../constants/ui'
+import CellBase, { CellProps } from './CellBase'
 
-type CellProps = {
-  idx: number
-  value: 'X' | 'O' | null
-  position: [number, number, number]
-  onClick: (i: number) => void
-  disabled?: boolean
-  showEdges?: boolean
-  edgeColor?: string
-  cellColor?: string
-  cellEmissive?: string
-  showFill?: boolean
-  edgeBaseOpacity?: number
-  fillOpacity?: number
-}
-
-export default function Cell({ idx, value, position, onClick, disabled, showEdges = true, edgeColor, cellColor, cellEmissive, showFill = false, edgeBaseOpacity, fillOpacity }: CellProps) {
-  const mesh = useRef<THREE.Mesh>(null!)
-  const hover = useRef(false)
+export default function Cell(props: CellProps) {
+  const { showFill = false, fillOpacity, cellColor, cellEmissive } = props
+  const { idx, value, edgeColor, showEdges = true } = props
   const edgeRef = useRef<THREE.LineSegments>(null!)
   const edgeMatRef = useRef<THREE.LineBasicMaterial>(null!)
-  const transform = useRef<THREE.Group>(null!)
 
   const edgesGeom = useMemo(() => {
-    const geo = new THREE.BoxGeometry(2.8, 2.8, 2.8)
+    const geo = new THREE.BoxGeometry(SIZES.cellSize, SIZES.cellSize, SIZES.cellSize)
     const edges = new THREE.EdgesGeometry(geo)
-    // add per-vertex colors to create a pearlescent, non-uniform gradient
     const pos = edges.attributes.position
     const count = pos.count
     const colors = new Float32Array(count * 3)
@@ -37,14 +22,11 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
       const x = pos.getX(i)
       const y = pos.getY(i)
       const z = pos.getZ(i)
-      // deterministic seed per vertex
-      const s = Math.abs(Math.sin((x * 12.9898 + y * 78.233 + z * 45.164 + idx * 3.1415))) % 1
+      const s = Math.abs(Math.sin(x * 12.9898 + y * 78.233 + z * 45.164 + idx * 3.1415)) % 1
       const mixv = 0.25 + 0.7 * s
-      // mix base colors
       let r = baseA.r * (1 - mixv) + baseB.r * mixv
       let g = baseA.g * (1 - mixv) + baseB.g * mixv
       let b = baseA.b * (1 - mixv) + baseB.b * mixv
-      // add subtle pearlescent shift towards white based on another pattern
       const pearl = 0.12 * Math.abs(Math.sin(s * Math.PI * 2 + idx * 0.37))
       r = r + (1.0 - r) * pearl
       g = g + (1.0 - g) * pearl
@@ -58,70 +40,48 @@ export default function Cell({ idx, value, position, onClick, disabled, showEdge
   }, [idx, value, edgeColor])
 
   useEffect(() => {
-    // prevent edge lines from intercepting pointer events so hover remains on the group/mesh
     if (edgeRef.current) {
-      // disable raycast for the line segments
+      // disable raycast for the line segments so pointer remains on the cell group
       // @ts-ignore
       edgeRef.current.raycast = () => null
     }
   }, [])
 
   useFrame((state) => {
-    if (!transform.current) return
-    const t = state.clock.getElapsedTime()
-    const target = hover.current ? 1.08 : 1.0
-    const cur = transform.current.scale.x
-    const next = cur + (target - cur) * 0.12
-    transform.current.scale.set(next, next, next)
-
-    // animate edge glow opacity (simple pulsing shimmer)
     if (edgeMatRef.current) {
-      const base = hover.current ? 0.6 : (typeof (edgeBaseOpacity) === 'number' ? edgeBaseOpacity : 0.18)
-      const pulse = 0.5 + 0.5 * Math.sin(t * 3.0 + idx * 0.7)
+      const t = state.clock.getElapsedTime()
+      const base = typeof props.edgeBaseOpacity === 'number' ? props.edgeBaseOpacity : 0.18
+      const pulse = 0.5 + 0.5 * Math.sin(t * 3.0 + props.idx * 0.7)
       edgeMatRef.current.opacity = Math.min(1, base + pulse * 0.6)
     }
   })
 
   return (
-    <group position={position}>
-      <group
-        ref={transform}
-        onPointerOver={() => (hover.current = true)}
-        onPointerOut={() => (hover.current = false)}
-        onPointerDown={(e) => {
-          e.stopPropagation()
-          if (!disabled) onClick(idx)
-        }}
-      >
-        <mesh ref={mesh}>
-          <boxGeometry args={[2.8, 2.8, 2.8]} />
-          <meshStandardMaterial
-            // when showing fill (modal) use less metallic/more rough so color reads better
-            metalness={showFill ? 0.2 : 0.8}
-            roughness={showFill ? 0.6 : 0.2}
-            color={cellColor ?? '#0b1220'}
-            // give a small emissive tint when filled so dark-blue is visible under lighting
-            emissive={cellEmissive ?? (showFill ? (cellColor ?? '#0b1220') : '#000000')}
-            emissiveIntensity={showFill ? 0.08 : 0}
-            // allow explicit fill opacity; default to 1 when showFill is true
-            transparent={typeof fillOpacity === 'number' ? fillOpacity < 1 : !showFill}
-            opacity={typeof fillOpacity === 'number' ? fillOpacity : (showFill ? 1 : 0)}
-            depthWrite={typeof fillOpacity === 'number' ? fillOpacity === 1 : showFill}
-          />
-        </mesh>
+    <CellBase {...props}>
+      <mesh>
+        <boxGeometry args={[2.8, 2.8, 2.8]} />
+        <meshStandardMaterial
+          metalness={showFill ? 0.2 : 0.8}
+          roughness={showFill ? 0.6 : 0.2}
+          color={cellColor}
+          emissive={cellEmissive}
+          emissiveIntensity={showFill ? 0.08 : 0}
+          transparent={typeof fillOpacity === 'number' ? fillOpacity < 1 : !showFill}
+          opacity={typeof fillOpacity === 'number' ? fillOpacity : (showFill ? 1 : 0)}
+          depthWrite={typeof fillOpacity === 'number' ? fillOpacity === 1 : showFill}
+        />
+      </mesh>
 
-        {/* animated rim along edges (can be disabled or recolored via props) */}
-        {showEdges ? (
-          <lineSegments ref={edgeRef} geometry={edgesGeom} renderOrder={999}>
-            <lineBasicMaterial
-              ref={edgeMatRef as any}
-              vertexColors={true}
-              transparent={true}
-              opacity={0.85}
-            />
-          </lineSegments>
-        ) : null}
-      </group>
-    </group>
+      {showEdges ? (
+        <lineSegments ref={edgeRef} geometry={edgesGeom} renderOrder={999}>
+          <lineBasicMaterial
+            ref={edgeMatRef as any}
+            vertexColors={true}
+            transparent={true}
+            opacity={0.85}
+          />
+        </lineSegments>
+      ) : null}
+    </CellBase>
   )
 }

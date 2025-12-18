@@ -1,0 +1,11 @@
+Model Information:
+* title:	DonutCatV.2!
+* source:	https://sketchfab.com/3d-models/donutcatv2-ac20372d50994a0f87afe3c5ef107a86
+* author:	LUMENE (https://sketchfab.com/LUMENE)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "DonutCatV.2!" (https://sketchfab.com/3d-models/donutcatv2-ac20372d50994a0f87afe3c5ef107a86) by LUMENE (https://sketchfab.com/LUMENE) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,6 +1,7 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useTheme } from '../../theme/ThemeContext'
 
 type ResetModelProps = {
   scale?: number
@@ -199,10 +200,42 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
   const triEdgeRef = React.useRef<THREE.LineSegments>(null!)
   const triEdgeMat = React.useRef<THREE.LineBasicMaterial>(null!)
 
+  const { theme } = useTheme()
+
+  // (no overlay shader here) reset button uses edge lines similar to dark theme
+
+
   React.useEffect(() => {
     if (ringEdgeRef.current) (ringEdgeRef.current as any).raycast = () => null
     if (triEdgeRef.current) (triEdgeRef.current as any).raycast = () => null
-  }, [])
+    // always show edges; switch to white color in light theme
+    if (ringEdgeRef.current) ringEdgeRef.current.visible = true
+    if (triEdgeRef.current) triEdgeRef.current.visible = true
+    if (ringEdgeMat.current) {
+      if (theme === 'light') {
+        ringEdgeMat.current.vertexColors = false
+        ringEdgeMat.current.color.set('#ffffff')
+        ringEdgeMat.current.opacity = 1.0
+        ringEdgeMat.current.transparent = false
+      } else {
+        ringEdgeMat.current.vertexColors = true
+        ringEdgeMat.current.transparent = true
+      }
+      ringEdgeMat.current.needsUpdate = true
+    }
+    if (triEdgeMat.current) {
+      if (theme === 'light') {
+        triEdgeMat.current.vertexColors = false
+        triEdgeMat.current.color.set('#ffffff')
+        triEdgeMat.current.opacity = 1.0
+        triEdgeMat.current.transparent = false
+      } else {
+        triEdgeMat.current.vertexColors = true
+        triEdgeMat.current.transparent = true
+      }
+      triEdgeMat.current.needsUpdate = true
+    }
+  }, [theme])
 
   useFrame((state) => {
     if (!group.current) return
@@ -213,14 +246,23 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
     group.current.rotation.y += 0.01
     const t = state.clock.getElapsedTime()
     if (ringEdgeMat.current) {
-      const base = hover.current ? 0.7 : 0.22
-      const pulse = 0.5 + 0.5 * Math.sin(t * 3.0)
-      ringEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      if (theme === 'light') {
+        // static white lines in light theme
+        ringEdgeMat.current.opacity = 0.85
+      } else {
+        const base = hover.current ? 0.7 : 0.22
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3.0)
+        ringEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      }
     }
     if (triEdgeMat.current) {
-      const base = hover.current ? 0.7 : 0.22
-      const pulse = 0.5 + 0.5 * Math.sin(t * 3.2 + 0.9)
-      triEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      if (theme === 'light') {
+        triEdgeMat.current.opacity = 0.85
+      } else {
+        const base = hover.current ? 0.7 : 0.22
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3.2 + 0.9)
+        triEdgeMat.current.opacity = Math.min(1, base + pulse * 0.6)
+      }
     }
   })
 
@@ -251,7 +293,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           <primitive object={ringGeom} attach="geometry" />
           <meshStandardMaterial color={'#900000'} metalness={0.25} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={ringEdgeRef} geometry={ringEdgesGeom} renderOrder={999}>
-            <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
+            <lineBasicMaterial ref={ringEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} toneMapped={false} />
           </lineSegments>
         </mesh>
 
@@ -266,7 +308,7 @@ export default function ResetModel({ scale = 0.9, y = 0.0, globalScale = 1, onCl
           <primitive object={triGeom} attach="geometry" />
           <meshStandardMaterial color={'#900000'} metalness={0.35} roughness={0.2} side={THREE.DoubleSide} transparent={true} opacity={0} depthWrite={false} />
           <lineSegments ref={triEdgeRef} geometry={triEdgesGeom} renderOrder={999}>
-            <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} />
+            <lineBasicMaterial ref={triEdgeMat as any} vertexColors={true} transparent={true} opacity={0.85} toneMapped={false} />
           </lineSegments>
         </mesh>
 
