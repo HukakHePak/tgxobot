@@ -15,7 +15,8 @@ try {
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ jsxRuntime: 'classic' })],
+  resolve: {},
   optimizeDeps: {
     include: ['@react-three/fiber', '@react-three/drei', 'three']
   },

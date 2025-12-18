@@ -22,7 +22,5 @@ app.use(express.json());
 // nginx already routes /api/* -> backend, expose endpoint without the /api prefix
 app.post('/send-result', sendResultHandler);
 
-
-const PORT = Number(process.env.PORT) || 3001;
 console.log('Starting server...');
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+app.listen(3001, () => console.log('Server listening on 3001'));

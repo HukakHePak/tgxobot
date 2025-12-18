@@ -1,11 +1,9 @@
 import React, { Suspense } from 'react'
 import GenericModel from './GenericModel'
-import { resolveAssetUrl } from '../../utils/assetResolver'
 import AnimatedModel from './AnimatedModel'
 
 export default function RocketModel(props: { scale?: number; y?: number }) {
-  const url = resolveAssetUrl('../../assets/models/toon_rocket/scene.gltf')
-  if (!url) return null
+  const url = '/assets/models/toon_rocket/scene.gltf'
 
   // Reduce rocket size further: use divisor 4 (smaller than previous 3)
   const requested = props.scale ?? 0.6
