@@ -78,7 +78,7 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
         width: '100%',
         height: '100vh',
         boxSizing: 'border-box',
-        backgroundImage: `linear-gradient(150deg, #ffd1dcff 0%, #FFB3C7 60%)`,
+        backgroundImage: `linear-gradient(150deg, #ff98b1 0%, #ffc6d5 60%)`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat'
       }
