@@ -1,10 +1,7 @@
 import React, { useRef, useEffect } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import RotatingCell from './RotatingCell'
-import { RoundedBox } from '@react-three/drei'
-import useChaoticRotation from './useChaoticRotation'
-import useDirectionalRotation from './useDirectionalRotation'
-import * as THREE from 'three'
+import RotatingRoundedBox from './RotatingRoundedBox'
 import { useTheme } from '../../theme/ThemeContext'
 
 type ModalProps = {
@@ -41,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children }) => {
               {theme === 'light' ? (
                 <RotatingRoundedBox />
               ) : (
-                <RotatingCell />
+                <RotatingCell scale={1.2} />
               )}
           </Canvas>
 
