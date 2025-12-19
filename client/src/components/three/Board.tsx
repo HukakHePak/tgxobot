@@ -134,13 +134,13 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
 
               {squares[i] === 'X' && (
                 <group position={pos}>
-                  {theme === 'light' ? <BananaModel scale={0.45} /> : <RocketModel scale={0.4} y={0} />}
+                  {theme === 'light' ? <BananaModel scale={0.7} /> : <RocketModel scale={0.6} y={0} />}
                 </group>
               )}
 
               {squares[i] === 'O' && (
                 <group position={pos}>
-                  {theme === 'light' ? <DonutModel color={planetColor} scale={0.36} /> : <PlanetModel color={planetColor} scale={0.4} />}
+                  {theme === 'light' ? <DonutModel color={planetColor} scale={0.55} /> : <PlanetModel color={planetColor} scale={0.6} />}
                 </group>
               )}
             </group>
