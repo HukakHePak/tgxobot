@@ -41,6 +41,7 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
   })
 
   const prevSquaresRef = useRef<Square[] | null>(null)
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const prev = prevSquaresRef.current
@@ -52,6 +53,23 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
     }
     prevSquaresRef.current = [...squares]
   }, [squares])
+
+  // Prevent the page from overscrolling / bouncing when interacting with the canvas on mobile.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    const prevent = (e: TouchEvent) => {
+      if (e.touches && e.touches.length === 1) {
+        e.preventDefault()
+      }
+    }
+
+    el.addEventListener('touchmove', prevent, { passive: false })
+    return () => {
+      el.removeEventListener('touchmove', prevent)
+    }
+  }, [])
 
   const { theme } = useTheme()
 
@@ -67,7 +85,7 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
     : { width: '100%', height: '100vh', boxSizing: 'border-box', background: '#0b1220' }
 
   return (
-    <div style={containerStyle}>
+    <div ref={containerRef} style={{ ...containerStyle, touchAction: 'none', overscrollBehavior: 'contain' }}>
       <Canvas
         camera={{ position: [0, 40, 0], fov: 50 }}
         onCreated={({ camera }) => {
