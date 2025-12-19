@@ -41,6 +41,7 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
   })
 
   const prevSquaresRef = useRef<Square[] | null>(null)
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const prev = prevSquaresRef.current
@@ -53,6 +54,23 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
     prevSquaresRef.current = [...squares]
   }, [squares])
 
+  // Prevent the page from overscrolling / bouncing when interacting with the canvas on mobile.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    const prevent = (e: TouchEvent) => {
+      if (e.touches && e.touches.length === 1) {
+        e.preventDefault()
+      }
+    }
+
+    el.addEventListener('touchmove', prevent, { passive: false })
+    return () => {
+      el.removeEventListener('touchmove', prevent)
+    }
+  }, [])
+
   const { theme } = useTheme()
 
   const containerStyle: React.CSSProperties = theme === 'light'
@@ -60,14 +78,14 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
         width: '100%',
         height: '100vh',
         boxSizing: 'border-box',
-        backgroundImage: `linear-gradient(150deg, #ffd1dcff 0%, #FFB3C7 60%)`,
+        backgroundImage: `linear-gradient(150deg, #ff98b1 0%, #ffc6d5 60%)`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat'
       }
     : { width: '100%', height: '100vh', boxSizing: 'border-box', background: '#0b1220' }
 
   return (
-    <div style={containerStyle}>
+    <div ref={containerRef} style={{ ...containerStyle, touchAction: 'none', overscrollBehavior: 'contain' }}>
       <Canvas
         camera={{ position: [0, 40, 0], fov: 50 }}
         onCreated={({ camera }) => {
@@ -116,13 +134,13 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset,
 
               {squares[i] === 'X' && (
                 <group position={pos}>
-                  {theme === 'light' ? <BananaModel scale={0.45} /> : <RocketModel scale={0.4} y={0} />}
+                  {theme === 'light' ? <BananaModel scale={0.7} /> : <RocketModel scale={0.6} y={0} />}
                 </group>
               )}
 
               {squares[i] === 'O' && (
                 <group position={pos}>
-                  {theme === 'light' ? <DonutModel color={planetColor} scale={0.36} /> : <PlanetModel color={planetColor} scale={0.4} />}
+                  {theme === 'light' ? <DonutModel color={planetColor} scale={0.55} /> : <PlanetModel color={planetColor} scale={0.6} />}
                 </group>
               )}
             </group>

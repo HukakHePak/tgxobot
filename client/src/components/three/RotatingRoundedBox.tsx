@@ -1,0 +1,80 @@
+import React, { useRef, useEffect } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { RoundedBox } from '@react-three/drei'
+import useDirectionalRotation from './useDirectionalRotation'
+import * as THREE from 'three'
+
+export default function RotatingRoundedBox() {
+  const groupRef = useDirectionalRotation({ interval: 3.2, maxSpeed: 1.2 })
+
+  const overlayUniforms = useRef({
+    uTime: { value: 0 },
+    uColor: { value: new THREE.Color(0xffffff) },
+    uPower: { value: 2.2 },
+    uRimStrength: { value: 0.9 }
+  })
+
+  const overlayMat = useRef(
+    new THREE.ShaderMaterial({
+      uniforms: overlayUniforms.current,
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPosition.xyz);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor;
+        uniform float uPower;
+        uniform float uRimStrength;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float fresnel = pow(1.0 - max(0.0, dot(vNormal, vViewDir)), uPower);
+          float rim = uRimStrength * fresnel;
+          vec3 col = uColor * rim * 1.0;
+          gl_FragColor = vec4(col, clamp(rim * 1.0, 0.0, 0.6));
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  )
+
+  useFrame((state) => {
+    overlayUniforms.current.uTime.value = state.clock.getElapsedTime()
+  })
+
+  useEffect(() => {
+    overlayUniforms.current.uColor.value.set('#ffffff')
+  }, [])
+
+  return (
+    <group ref={groupRef} position={[0, 0, 0]}>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 10, 5]} intensity={0.5} />
+      <RoundedBox args={[4.0, 4.0, 4.0]} radius={0.6} smoothness={10}>
+        <meshStandardMaterial
+          color={'#ff9fcf'}
+          emissive={'#ffd6e8'}
+          emissiveIntensity={0.55}
+          transparent
+          opacity={0.6}
+          metalness={0.02}
+          roughness={0.32}
+        />
+      </RoundedBox>
+      <group scale={[1.002, 1.002, 1.002]} position={[0, 0, 0]} renderOrder={20}>
+        <RoundedBox args={[4.0, 4.0, 4.0]} radius={0.6} smoothness={10}>
+          <primitive object={overlayMat.current} attach="material" />
+        </RoundedBox>
+      </group>
+    </group>
+  )
+}

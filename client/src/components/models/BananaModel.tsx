@@ -7,7 +7,7 @@ const BananaModel: React.FC<{ scale?: number }> = ({ scale = 0.45 }) => {
   return (
     <AnimatedModel finalScale={scale}>
       <Suspense fallback={null}>
-        <GenericModel url={url} scale={1} position={[0, -1.2, 0]} />
+        <GenericModel url={url} scale={1} position={[0, -1.5, 0]} />
       </Suspense>
     </AnimatedModel>
   )
