@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { LoadingManager } from 'three'
 import { useTheme } from '../theme/ThemeContext'
 import LoadingBlock from './LoadingBlock'
 
@@ -13,22 +14,35 @@ const DARK_ASSETS = [
 ]
 
 async function loadUrls(urls: string[]) {
-  const loader = new GLTFLoader()
-  const promises = urls.map(
-    (u) =>
-      new Promise((res) =>
-        loader.load(
-          u,
-          (gltf) => res(gltf),
-          undefined,
-          () => {
-            // ignore individual load errors, resolve to null
-            res(null)
-          }
-        )
+  return new Promise((resolve) => {
+    const manager = new LoadingManager()
+    const loader = new GLTFLoader(manager)
+    const results: any[] = new Array(urls.length)
+
+    // safety timeout so we don't hang forever
+    const SAFETY_MS = 30000
+    const safety = setTimeout(() => resolve(results), SAFETY_MS)
+
+    // resolve when LoadingManager reports that all tracked items finished
+    manager.onLoad = () => {
+      clearTimeout(safety)
+      resolve(results)
+    }
+
+    // load each url; GLTFLoader will register additional resources (e.g. .bin, textures)
+    urls.forEach((u, i) => {
+      loader.load(
+        u,
+        (gltf) => {
+          results[i] = gltf
+        },
+        undefined,
+        () => {
+          results[i] = null
+        }
       )
-  )
-  await Promise.all(promises)
+    })
+  })
 }
 
 // AssetPreloader no longer blocks rendering: it starts preloading only after
@@ -95,8 +109,8 @@ export default function AssetPreloader({ onLoadingChange, themeOverride }: { onL
     }
   }, [theme])
 
-//   if (loading && !done) return <LoadingBlock />
-//   return null
+  if (loading && !done) return <LoadingBlock themeOverride={theme} />
+  return null
 
-    return <LoadingBlock themeOverride={theme} />
+    // return <LoadingBlock themeOverride={theme} />
 }
