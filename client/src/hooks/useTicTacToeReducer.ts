@@ -80,21 +80,40 @@ export function useTicTacToeReducer(onResult: (result: 'win' | 'loss', code?: st
       const empty = state.squares.map((v, i) => (v ? null : i)).filter((v) => v !== null) as number[]
 
       const computeAIMove = (): number | undefined => {
+        // collect immediate winning moves
+        const winMoves: number[] = []
         for (const idx of empty) {
           const test = state.squares.slice()
           test[idx] = 'O'
-          if (checkWinner(test) === 'O') return idx
+          if (checkWinner(test) === 'O') winMoves.push(idx)
         }
+        if (winMoves.length) return winMoves[Math.floor(Math.random() * winMoves.length)]
+
+        // collect blocking moves (prevent X win)
+        const blockMoves: number[] = []
         for (const idx of empty) {
           const test = state.squares.slice()
           test[idx] = 'X'
-          if (checkWinner(test) === 'X') return idx
+          if (checkWinner(test) === 'X') blockMoves.push(idx)
         }
+        if (blockMoves.length) return blockMoves[Math.floor(Math.random() * blockMoves.length)]
+
+        // small randomness: occasionally play a random empty move
+        if (Math.random() < 0.15) {
+          return empty[Math.floor(Math.random() * empty.length)]
+        }
+
+        // prefer center
         if (empty.includes(4)) return 4
-        const corners = [0, 2, 6, 8]
-        for (const c of corners) if (empty.includes(c)) return c
-        const sides = [1, 3, 5, 7]
-        for (const s of sides) if (empty.includes(s)) return s
+
+        // prefer corners (random among available)
+        const corners = [0, 2, 6, 8].filter((c) => empty.includes(c))
+        if (corners.length) return corners[Math.floor(Math.random() * corners.length)]
+
+        // then sides (random)
+        const sides = [1, 3, 5, 7].filter((s) => empty.includes(s))
+        if (sides.length) return sides[Math.floor(Math.random() * sides.length)]
+
         return undefined
       }
 
