@@ -36,4 +36,3 @@ services:
 networks:
   traefik:
     external: true
-    name: traefik
