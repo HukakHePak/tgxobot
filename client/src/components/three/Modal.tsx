@@ -114,7 +114,7 @@ function RotatingRoundedBox() {
     <group ref={groupRef} position={[0, 0, 0]}>
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 10, 5]} intensity={0.5} />
-      <RoundedBox args={[5.2, 5.2, 5.2]} radius={0.6} smoothness={10}>
+      <RoundedBox args={[4.0, 4.0, 4.0]} radius={0.6} smoothness={10}>
         <meshStandardMaterial
           color={'#ff9fcf'}
           emissive={'#ffd6e8'}
@@ -126,7 +126,7 @@ function RotatingRoundedBox() {
         />
       </RoundedBox>
       <group scale={[1.002, 1.002, 1.002]} position={[0, 0, 0]} renderOrder={20}>
-        <RoundedBox args={[5.2, 5.2, 5.2]} radius={0.6} smoothness={10}>
+        <RoundedBox args={[4.0, 4.0, 4.0]} radius={0.6} smoothness={10}>
           <primitive object={overlayMat.current} attach="material" />
         </RoundedBox>
       </group>
