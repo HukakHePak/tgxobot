@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
+import { Html } from '@react-three/drei'
 import Cell from './Cell'
 import RoundedCell from './RoundedCell'
 import RocketModel from '../models/RocketModel'
@@ -10,6 +11,7 @@ import DonutModel from '../models/DonutModel'
 import { useTheme } from '../../theme/ThemeContext'
 import ResetModel from '../models/ResetModel'
 import LogoSprite from './LogoSprite'
+import AssetPreloader from '../AssetPreloader'
 
 type Square = 'X' | 'O' | null
 
@@ -18,9 +20,10 @@ interface BoardProps {
   onClick: (index: number) => void
   disabled?: boolean
   reset: () => void
+  preloading?: boolean
 }
 
-export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset }) => {
+export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset, preloading }) => {
   const positions: [number, number, number][] = [
     [-3.2, 0, -3.2],
     [0, 0, -3.2],
@@ -129,7 +132,15 @@ export const Board: React.FC<BoardProps> = ({ squares, onClick, disabled, reset 
             <ResetModel scale={0.85} y={0.0} onClick={reset} />
           </group>
 
-          <LogoSprite position={[0, 0, -10]} scale={[5, 2, 1]} />
+          {/* Put the logo and the loader into the same local group so the
+              loader is positioned exactly relative to the logo (and will
+              move/rotate together with it). */}
+          <group position={[0, 0, -10]}>
+            <LogoSprite position={[0, 0, 0]} scale={[5, 2, 1]} />
+            <Html transform position={[0, 0, 2.5]} center sprite>
+              <AssetPreloader themeOverride={theme} />
+            </Html>
+          </group>
         </group>
 
         <OrbitControls enablePan={false} enableRotate={true} maxDistance={80} minDistance={12} />
