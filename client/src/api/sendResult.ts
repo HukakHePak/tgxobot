@@ -1,15 +1,7 @@
 export async function sendResult(result: 'win' | 'loss', chatId?: number, code?: string) {
   try {
-    let base = '';
-    const webAppUrl = import.meta.env.VITE_WEBAPP_URL as string | undefined;
-    if (webAppUrl) {
-      try {
-        const url = new URL(webAppUrl);
-        base = url.origin;
-      } catch {}
-    }
-    if (!base) base = 'http://localhost:3001';
-    await fetch(`${base}/api/send-result`, {
+    // Use same-origin relative path so production routing (Traefik) handles /api
+    await fetch(`/api/send-result`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ result, code, chat_id: chatId })
