@@ -99,7 +99,8 @@ export function useTicTacToeReducer(onResult: (result: 'win' | 'loss', code?: st
         if (blockMoves.length) return blockMoves[Math.floor(Math.random() * blockMoves.length)]
 
         // small randomness: occasionally play a random empty move
-        if (Math.random() < 0.15) {
+        // increased to ~50% variability per user request
+        if (Math.random() < 0.5) {
           return empty[Math.floor(Math.random() * empty.length)]
         }
 
