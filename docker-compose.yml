@@ -11,8 +11,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tgxobot-server.rule=Host(`oxo.hukakhepak.ru`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.tgxobot-server.entrypoints=web,websecure"
+      - "traefik.http.routers.tgxobot-server.entrypoints=websecure"
       - "traefik.http.routers.tgxobot-server.tls=true"
+      - "traefik.http.routers.myrouter.tls.certresolver=myresolver"
       - "traefik.http.services.tgxobot-server.loadbalancer.server.port=3001"
 
   client:
@@ -26,8 +27,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tgxobot-client.rule=Host(`oxo.hukakhepak.ru`)"
-      - "traefik.http.routers.tgxobot-client.entrypoints=web,websecure"
+      - "traefik.http.routers.tgxobot-client.entrypoints=websecure"
       - "traefik.http.routers.tgxobot-client.tls=true"
+      - "traefik.http.routers.myrouter.tls.certresolver=myresolver"
       - "traefik.http.services.tgxobot-client.loadbalancer.server.port=80"
 
 
