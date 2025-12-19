@@ -22,6 +22,7 @@
 	- `BOT_TOKEN` — токен Telegram-бота
 	- `VITE_WEBAPP_URL` — публичный ngrok-URL (например, https://xxxx.ngrok-free.dev)
 	- `NGROK_AUTHTOKEN` — ваш токен ngrok
+	- `NGINX_PORT` — для переопределения порта nginx
 
 2. Запустите dev-окружение:
 ```bash

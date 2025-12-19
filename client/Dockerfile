@@ -1,8 +1,11 @@
-# Dockerfile for client (Node 20, prod by default)
-FROM node:20-alpine
+# Multi-stage Dockerfile for client: build with Node, serve static with nginx
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --silent
 COPY . .
 RUN npm run build
-CMD ["npm", "run", "preview", "--", "--host"]
+
+FROM nginx:1.25-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]

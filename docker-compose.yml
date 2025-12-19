@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  server:
+    build:
+      context: ./server
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tgxobot-server.rule=Host(`oxo.hukakhepak.ru`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tgxobot-server.entrypoints=websecure"
+      - "traefik.http.routers.tgxobot-server.tls=true"
+      - "traefik.http.services.tgxobot-server.loadbalancer.server.port=3001"
+
+  client:
+    build:
+      context: ./client
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tgxobot-client.rule=Host(`oxo.hukakhepak.ru`)"
+      - "traefik.http.routers.tgxobot-client.entrypoints=websecure"
+      - "traefik.http.routers.tgxobot-client.tls=true"
+      - "traefik.http.services.tgxobot-client.loadbalancer.server.port=80"
+
+
+networks:
+  traefik:
+    external: true
+    name: traefik

@@ -1,15 +1,14 @@
 import React, { Suspense, useMemo } from 'react'
 import GenericModel from './GenericModel'
-import { resolveAssetUrl } from '../../utils/assetResolver'
 import AnimatedModel from './AnimatedModel'
 
 export const PLANET_COLORS = ['blue', 'green', 'purple', 'red'] as const
 
-const COLOR_TO_URL: Record<string, string | null> = {
-  blue: resolveAssetUrl('../../assets/models/planets/planet_blue/scene.gltf'),
-  green: resolveAssetUrl('../../assets/models/planets/planet_green/scene.gltf'),
-  purple: resolveAssetUrl('../../assets/models/planets/planet_purple/scene.gltf'),
-  red: resolveAssetUrl('../../assets/models/planets/planet_red/scene.gltf')
+const COLOR_TO_URL: Record<string, string> = {
+  blue: '/assets/models/planets/planet_blue/scene.gltf',
+  green: '/assets/models/planets/planet_green/scene.gltf',
+  purple: '/assets/models/planets/planet_purple/scene.gltf',
+  red: '/assets/models/planets/planet_red/scene.gltf'
 }
 
 export default function PlanetModel({ color = 'blue', scale = 0.35 }: { color?: string; scale?: number }) {
